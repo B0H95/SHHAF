@@ -6,6 +6,7 @@
 #include "log.hh"
 #include "window.hh"
 #include "ui.hh"
+#include "simulation.hh"
 
 static bool running = true;
 static int argumentCount;
@@ -33,6 +34,15 @@ bool SHH::ProgramController::Init(int argc, char* argv[])
     if (!SHH::UI::Init())
     {
 	SHH::Log::Error("SHH::ProgramController::Init(): Could not init UI.");
+	SHH::Window::Deinit();
+	return false;
+    }
+
+    if (!SHH::Simulation::Init())
+    {
+	SHH::Log::Error("SHH::ProgramController::Init(): Could not init simulation.");
+	SHH::UI::Deinit();
+	SHH::Window::Deinit();
 	return false;
     }
 
@@ -44,6 +54,7 @@ void SHH::ProgramController::Deinit()
 {
     SHH::Log::Log("SHH::ProgramController::Deinit(): Start.");
 
+    SHH::Simulation::Deinit();
     SHH::UI::Deinit();
     SHH::Window::Deinit();
 
@@ -58,10 +69,9 @@ void SHH::ProgramController::Run()
     {
 	startTime = std::chrono::high_resolution_clock::now();
 
-	SHH::Window::ProcessEvents();
-	
+	SHH::Window::ProcessEvents();	
 	SHH::UI::ProcessInputs();
-
+	SHH::Simulation::Update();
 	SHH::UI::Draw();
 
 	endTime = std::chrono::high_resolution_clock::now();

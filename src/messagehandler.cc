@@ -66,11 +66,11 @@ message_ctrl SHH::MessageHandler::PopControlMessage()
 	inqueueCtrlStart = (inqueueCtrlStart + 1) % INQUEUE_CTRL_MAXSIZE;
 	return inqueueCtrl[temp];
     }
-    return {NOTHING, 0, 0, nullptr};
+    return {MC_NOTHING, 0, 0, nullptr};
 }
 
 message_sim SHH::MessageHandler::PopSimulationMessage()
 {
     //TODO: Networking
-    return {OBJECTUPDATE, NONE, NOWHERE, IDLE, 0, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
+    return {MS_OBJECTUPDATE, OT_NONE, OD_NOWHERE, OS_IDLE, 0, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
 }

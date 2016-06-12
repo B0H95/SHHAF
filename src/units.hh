@@ -4,34 +4,34 @@
 
 enum ostate
 {
-    IDLE
+    OS_IDLE
 };
 
 enum odirection
 {
-    NOWHERE,
-    UP,
-    RIGHT,
-    DOWN,
-    LEFT
+    OD_NOWHERE,
+    OD_UP,
+    OD_RIGHT,
+    OD_DOWN,
+    OD_LEFT
 };
 
 enum otype
 {
-    NONE,
-    BASIC
+    OT_NONE,
+    OT_BASIC
 };
 
 enum mstype
 {
-    OBJECTUPDATE
+    MS_OBJECTUPDATE
 };
 
 enum mctype
 {
-    NOTHING,
-    RUNLEFT,
-    RUNRIGHT
+    MC_NOTHING,
+    MC_RUNLEFT,
+    MC_RUNRIGHT
 };
 
 struct object

@@ -55,7 +55,7 @@ static void drawSimulation()
 
     for (int i = 0; i < objectListSize; ++i)
     {
-	if (objectList[i].type != NONE)
+	if (objectList[i].type != OT_NONE)
 	{
 	    int x1 = (int)objectList[i].x;
 	    int y1 = (int)objectList[i].y;

@@ -21,9 +21,9 @@ bool SHH::Simulation::Init()
 
     for (int i = 0; i < OBJECT_LIST_SIZE; ++i)
     {
-	objectList[i].type = NONE;
-	objectList[i].state = IDLE;
-	objectList[i].direction = NOWHERE;
+	objectList[i].type = OT_NONE;
+	objectList[i].state = OS_IDLE;
+	objectList[i].direction = OD_NOWHERE;
 	objectList[i].x = 0.0f;
 	objectList[i].y = 0.0f;
 	objectList[i].xspeed = 0.0f;
@@ -84,7 +84,7 @@ bool SHH::Simulation::InsertObject(object const& obj)
     int freeIndex;
     for (freeIndex = 0; freeIndex < OBJECT_LIST_SIZE; ++freeIndex)
     {
-	if (objectList[freeIndex].type == NONE) break;
+	if (objectList[freeIndex].type == OT_NONE) break;
     }
 
     if (freeIndex == OBJECT_LIST_SIZE)

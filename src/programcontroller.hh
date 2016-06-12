@@ -5,6 +5,7 @@ namespace SHH
     namespace ProgramController
     {
 	bool Init(int argc, char* argv[]);
+	bool Postinit();
 	void Deinit();
 	void Run();
 	void Quit();

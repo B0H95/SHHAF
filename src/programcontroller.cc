@@ -60,6 +60,20 @@ bool SHH::ProgramController::Init(int argc, char* argv[])
     return true;
 }
 
+bool SHH::ProgramController::Postinit()
+{
+    SHH::Log::Log("SHH::ProgramController::Postinit(): Start.");
+
+    if (!SHH::Simulation::Postinit())
+    {
+	SHH::Log::Error("SHH::ProgramController::Postinit(): Could not postinit simulation.");
+	return false;
+    }
+
+    SHH::Log::Log("SHH::ProgramController::Postinit(): Ended successfully.");
+    return true;
+}
+
 void SHH::ProgramController::Deinit()
 {
     SHH::Log::Log("SHH::ProgramController::Deinit(): Start.");

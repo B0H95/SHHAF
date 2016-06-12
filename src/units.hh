@@ -19,7 +19,14 @@ enum odirection
 enum otype
 {
     OT_NONE,
-    OT_BASIC
+    OT_BASIC,
+    OT_PLAYER
+};
+
+enum etype
+{
+    ET_NONE,
+    ET_SOLID
 };
 
 enum mstype
@@ -40,6 +47,12 @@ struct object
     ostate state;
     odirection direction;
     float xaccel,yaccel,xspeed,yspeed,x,y,width,height;
+};
+
+struct environment
+{
+    etype type;
+    float x,y,width,height;
 };
 
 struct message_sim

@@ -21,6 +21,15 @@ int main(int argc, char* argv[])
 	return 1;
     }
 
+    if (!SHH::ProgramController::Postinit())
+    {
+	SHH::Log::Error("main: Could not postinit the program controller.");
+	SHH::ProgramController::Deinit();
+	SHH::Log::Deinit();
+	std::cout << "main: Exited main with return code 1." << std::endl;
+	return 1;
+    }
+    
     SHH::ProgramController::Run();
 
     SHH::ProgramController::Deinit();

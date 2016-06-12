@@ -2,6 +2,7 @@
 
 #include "log.hh"
 #include "programcontroller.hh"
+#include "messagehandler.hh"
 
 static const int OBJECT_LIST_SIZE = 100;
 static object* objectList = nullptr;
@@ -34,7 +35,6 @@ bool SHH::Simulation::Init()
     }
 
     SHH::Log::Log("SHH::Simulation::Init(): Ended successfully.");
-    
     return true;
 }
 

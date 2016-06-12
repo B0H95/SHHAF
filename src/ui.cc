@@ -5,6 +5,7 @@
 #include "programcontroller.hh"
 #include "simulation.hh"
 #include "units.hh"
+#include "messagehandler.hh"
 
 static void drawFrameLoadBar();
 static void drawSimulation();

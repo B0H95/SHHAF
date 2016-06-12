@@ -7,6 +7,7 @@
 #include "window.hh"
 #include "ui.hh"
 #include "simulation.hh"
+#include "messagehandler.hh"
 
 static bool running = true;
 static int argumentCount;
@@ -46,6 +47,15 @@ bool SHH::ProgramController::Init(int argc, char* argv[])
 	return false;
     }
 
+    if (!SHH::MessageHandler::Init())
+    {
+	SHH::Log::Error("SHH::ProgramController::Init(): Could not init message handler.");
+	SHH::Simulation::Deinit();
+	SHH::UI::Deinit();
+	SHH::Window::Deinit();
+	return false;
+    }
+
     SHH::Log::Log("SHH::ProgramController::Init(): Ended successfully.");
     return true;
 }
@@ -54,6 +64,7 @@ void SHH::ProgramController::Deinit()
 {
     SHH::Log::Log("SHH::ProgramController::Deinit(): Start.");
 
+    SHH::MessageHandler::Deinit();
     SHH::Simulation::Deinit();
     SHH::UI::Deinit();
     SHH::Window::Deinit();

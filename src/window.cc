@@ -11,6 +11,8 @@ static SDL_Event event;
 static int windowWidth;
 static int windowHeight;
 
+static const Uint8* keystate = nullptr;
+
 bool SHH::Window::Init(int width, int height, std::string name)
 {
     SHH::Log::Log("SHH::Window::Init(" + std::to_string(width) + ", " + std::to_string(height) + ", \"" + name + "\"): Start.");
@@ -40,6 +42,8 @@ bool SHH::Window::Init(int width, int height, std::string name)
     
     windowWidth = width;
     windowHeight = height;
+
+    keystate = SDL_GetKeyboardState(nullptr);
 
     SHH::Log::Log("SHH::Window::Init(" + std::to_string(width) + ", " + std::to_string(height) + ", \"" + name + "\"): Ended successfully.");
     return true;
@@ -72,6 +76,11 @@ void SHH::Window::ProcessEvents()
 	    SHH::ProgramController::Quit();
 	}
     }
+}
+
+bool SHH::Window::IsKeyDown(const char* keyname)
+{
+    return keystate[SDL_GetScancodeFromKey(SDL_GetKeyFromName(keyname))] == 1;
 }
 
 int SHH::Window::GetWindowWidth()

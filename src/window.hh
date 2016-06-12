@@ -10,6 +10,7 @@ namespace SHH
 	bool Init(int width, int height, std::string name);
 	void Deinit();
 	void ProcessEvents();
+	bool IsKeyDown(const char* keyname);
 	int GetWindowWidth();
 	int GetWindowHeight();
 	void SetColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a);

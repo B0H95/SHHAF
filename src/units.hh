@@ -22,9 +22,16 @@ enum otype
     BASIC
 };
 
-enum mtype
+enum mstype
 {
     OBJECTUPDATE
+};
+
+enum mctype
+{
+    NOTHING,
+    RUNLEFT,
+    RUNRIGHT
 };
 
 struct object
@@ -35,21 +42,20 @@ struct object
     float xaccel,yaccel,xspeed,yspeed,x,y,width,height;
 };
 
-struct message
+struct message_sim
 {
-    uint8_t messagetype;
-    uint8_t objecttype;
-    uint8_t direction;
-    uint8_t state;
+    mstype messagetype;
+    otype objecttype;
+    odirection direction;
+    ostate state;
     uint32_t index;
     float x,y,xspeed,yspeed,xaccel,yaccel,width,height;
-    uint8_t strsize;
-    char* str;
-    uint32_t checksum;
 };
 
-struct queuemessage
+struct message_ctrl
 {
-    message msg;
-    bool fresh;
+    mctype messagetype;
+    uint8_t sender;
+    uint8_t strsize;
+    char* str;
 };

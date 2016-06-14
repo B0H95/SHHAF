@@ -85,3 +85,16 @@ struct behavior
     void (*OnUpdate)(object& obj);
     void (*OnMessage)(message_ctrl const& msg, object& obj);
 };
+
+namespace SHH
+{
+    namespace Units
+    {
+	void CreateNoneObject(object& obj);
+	void CreateNoneEnvironment(environment& env);
+	void CreateNoneControlMessage(message_ctrl& msg);
+	environment CreateSolidEnvironment(float x, float y, float w, float h);
+	object CreateBasicObject(float x, float y, float w, float h);
+	object CreatePlayerObject(float x, float y, float w, float h);
+    }
+}

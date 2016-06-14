@@ -34,10 +34,7 @@ bool SHH::Simulation::Behavior::Init()
 
     for (int i = 0; i < CONTROL_EVENT_LIST_MAXSIZE; ++i)
     {
-	controlEventList[i].messagetype = MC_NOTHING;
-	controlEventList[i].sender = 0;
-	controlEventList[i].strsize = 0;
-	controlEventList[i].str = nullptr;
+	SHH::Units::CreateNoneControlMessage(controlEventList[i]);
     }
 
     SHH::Log::Log("SHH::Simulation::Behavior::Init(): Ended successfully.");

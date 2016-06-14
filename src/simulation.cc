@@ -50,26 +50,12 @@ bool SHH::Simulation::Init()
 
     for (int i = 0; i < OBJECT_LIST_SIZE; ++i)
     {
-	objectList[i].type = OT_NONE;
-	objectList[i].state = OS_IDLE;
-	objectList[i].direction = OD_NOWHERE;
-	objectList[i].x = 0.0f;
-	objectList[i].y = 0.0f;
-	objectList[i].xspeed = 0.0f;
-	objectList[i].yspeed = 0.0f;
-	objectList[i].xaccel = 0.0f;
-	objectList[i].yaccel = 0.0f;
-	objectList[i].width = 0.0f;
-	objectList[i].height = 0.0f;
+	SHH::Units::CreateNoneObject(objectList[i]);
     }
 
     for (int i = 0; i < ENVIRONMENT_LIST_SIZE; ++i)
     {
-	environmentList[i].type = ET_NONE;
-	environmentList[i].x = 0.0f;
-	environmentList[i].y = 0.0f;
-	environmentList[i].width = 0.0f;
-	environmentList[i].height = 0.0f;
+	SHH::Units::CreateNoneEnvironment(environmentList[i]);
     }
 
     SHH::Log::Log("SHH::Simulation::Init(): Ended successfully.");
@@ -183,20 +169,13 @@ bool SHH::Simulation::InsertEnvironment(environment const& env)
 bool SHH::Simulation::LoadMap(std::string mapname)
 {
     SHH::Log::Warning("SHH::Simulation::LoadMap(\"" + mapname + "\"): To be implemented, loading default instead.");
-    environment e1 = {ET_SOLID,50.0f,500.0f,700.0f,50.0f};
-    environment e2 = {ET_SOLID,50.0f,450.0f,150.0f,50.0f};
-    environment e3 = {ET_SOLID,400.0f,490.0f,300.0f,10.0f};
-    SHH::Simulation::InsertEnvironment(e1);
-    SHH::Simulation::InsertEnvironment(e2);
-    SHH::Simulation::InsertEnvironment(e3);
-    object o1 = {OT_BASIC,OS_IDLE,OD_NOWHERE,0.0f,0.0f,0.0f,0.0f,100.0f,100.0f,32.0f,32.0f};
-    object o2 = {OT_BASIC,OS_IDLE,OD_NOWHERE,0.0f,0.0f,0.0f,0.0f,300.0f,350.0f,32.0f,32.0f};
-    object o3 = {OT_BASIC,OS_IDLE,OD_NOWHERE,0.0f,0.0f,0.0f,0.0f,600.0f,450.0f,32.0f,32.0f};
-    object o4 = {OT_PLAYER,OS_IDLE,OD_NOWHERE,0.0f,0.0f,0.0f,0.0f,400.0f,300.0f,32.0f,32.0f};
-    SHH::Simulation::InsertObject(o1);
-    SHH::Simulation::InsertObject(o2);
-    SHH::Simulation::InsertObject(o3);
-    SHH::Simulation::InsertObject(o4);
+    SHH::Simulation::InsertEnvironment(SHH::Units::CreateSolidEnvironment(50.0f,500.0f,700.0f,50.0f));
+    SHH::Simulation::InsertEnvironment(SHH::Units::CreateSolidEnvironment(50.0f,450.0f,150.0f,50.0f));
+    SHH::Simulation::InsertEnvironment(SHH::Units::CreateSolidEnvironment(400.0f,490.0f,300.0f,10.0f));
+    SHH::Simulation::InsertObject(SHH::Units::CreateBasicObject(100.0f,100.0f,32.0f,32.0f));
+    SHH::Simulation::InsertObject(SHH::Units::CreateBasicObject(300.0f,350.0f,32.0f,32.0f));
+    SHH::Simulation::InsertObject(SHH::Units::CreateBasicObject(600.0f,450.0f,32.0f,32.0f));
+    SHH::Simulation::InsertObject(SHH::Units::CreatePlayerObject(400.0f,300.0f,32.0f,32.0f));
     return true;
 }
 

@@ -1,6 +1,7 @@
 #include "simulation.hh"
 
 #include "simulation_behavior.hh"
+#include "simulation_physics.hh"
 
 #include "log.hh"
 #include "programcontroller.hh"
@@ -48,6 +49,17 @@ bool SHH::Simulation::Init()
 	return false;
     }
 
+    if (!SHH::Simulation::Physics::Init())
+    {
+	SHH::Log::Error("SHH::Simulation::Init(): Could not init physics.");
+	SHH::Simulation::Behavior::Deinit();
+	delete[] environmentList;
+	environmentList = nullptr;
+	delete[] objectList;
+	objectList = nullptr;
+	return false;
+    }
+
     for (int i = 0; i < OBJECT_LIST_SIZE; ++i)
     {
 	SHH::Units::CreateNoneObject(objectList[i]);
@@ -84,6 +96,7 @@ void SHH::Simulation::Deinit()
 	environmentList = nullptr;
     }
 
+    SHH::Simulation::Physics::Deinit();
     SHH::Simulation::Behavior::Deinit();
 
     SHH::Log::Log("SHH::Simulation::Deinit(): Ended successfully.");
@@ -195,12 +208,5 @@ static void updateApplyBehaviors()
 
 static void updateApplyPhysics()
 {
-    float frameTime = SHH::ProgramController::GetFrameTime();
-    for (int i = 0; i < OBJECT_LIST_SIZE; ++i)
-    {
-	objectList[i].xspeed += objectList[i].xaccel * frameTime;
-	objectList[i].yspeed += objectList[i].yaccel * frameTime;
-	objectList[i].x += objectList[i].xspeed * frameTime;
-	objectList[i].y += objectList[i].yspeed * frameTime;
-    }
+    SHH::Simulation::Physics::ApplyPhysics(objectList, objectListSize, environmentList, environmentListSize);
 }

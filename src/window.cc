@@ -15,18 +15,18 @@ static const Uint8* keystate = nullptr;
 
 bool SHH::Window::Init(int width, int height, std::string name)
 {
-    SHH::Log::Log("SHH::Window::Init(" + std::to_string(width) + ", " + std::to_string(height) + ", \"" + name + "\"): Start.");
+    SHH::Log::Log("SHH::Window::Init(): Start.");
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
-	SHH::Log::Error("SHH::Window::Init(" + std::to_string(width) + ", " + std::to_string(height) + ", \"" + name + "\"): SDL_Init failed.");
+	SHH::Log::Error("SHH::Window::Init(): SDL_Init failed.");
 	return false;
     }
 
     window = SDL_CreateWindow(name.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN);
     if (window == nullptr)
     {
-	SHH::Log::Error("SHH::Window::Init(" + std::to_string(width) + ", " + std::to_string(height) + ", \"" + name + "\"): SDL_CreateWindow failed.");
+	SHH::Log::Error("SHH::Window::Init(): SDL_CreateWindow failed.");
 	SDL_Quit();
 	return false;
     }
@@ -34,7 +34,7 @@ bool SHH::Window::Init(int width, int height, std::string name)
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if (renderer == nullptr)
     {
-	SHH::Log::Error("SHH::Window::Init(" + std::to_string(width) + ", " + std::to_string(height) + ", \"" + name + "\"): SDL_CreateRenderer failed.");
+	SHH::Log::Error("SHH::Window::Init(): SDL_CreateRenderer failed.");
 	SDL_DestroyWindow(window);
 	SDL_Quit();
 	return false;
@@ -45,7 +45,7 @@ bool SHH::Window::Init(int width, int height, std::string name)
 
     keystate = SDL_GetKeyboardState(nullptr);
 
-    SHH::Log::Log("SHH::Window::Init(" + std::to_string(width) + ", " + std::to_string(height) + ", \"" + name + "\"): Ended successfully.");
+    SHH::Log::Log("SHH::Window::Init(): Ended successfully.");
     return true;
 }
 

@@ -4,7 +4,9 @@
 
 enum ostate
 {
-    OS_IDLE
+    OS_IDLE,
+    OS_STANDING,
+    OS_FALLING
 };
 
 enum odirection
@@ -41,6 +43,7 @@ enum mctype
     MC_NOTHING,
     MC_RUNLEFT,
     MC_RUNRIGHT,
+    MC_JUMP,
 
     MC_MARKER_SIM,
 

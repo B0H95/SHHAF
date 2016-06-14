@@ -51,6 +51,11 @@ void SHH::UI::ProcessInputs()
 	msg.messagetype = MC_RUNRIGHT;
 	SHH::MessageHandler::PushControlMessage(msg);
     }
+    if (SHH::Window::IsKeyDown("up"))
+    {
+	msg.messagetype = MC_JUMP;
+	SHH::MessageHandler::PushControlMessage(msg);
+    }
 }
 
 static void drawFrameLoadBar()

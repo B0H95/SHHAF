@@ -1,5 +1,7 @@
 #include "simulation.hh"
 
+#include "simulation_behavior.hh"
+
 #include "log.hh"
 #include "programcontroller.hh"
 #include "messagehandler.hh"
@@ -11,6 +13,10 @@ static int objectListSize = 0;
 static const int ENVIRONMENT_LIST_SIZE = 100;
 static environment* environmentList = nullptr;
 static int environmentListSize = 0;
+
+static void distributeIncomingMessages();
+static void updateApplyBehaviors();
+static void updateApplyPhysics();
 
 bool SHH::Simulation::Init()
 {
@@ -27,6 +33,16 @@ bool SHH::Simulation::Init()
     if (environmentList == nullptr)
     {
 	SHH::Log::Error("SHH::Simulation::Init(): Could not allocate memory for environmentList.");
+	delete[] objectList;
+	objectList = nullptr;
+	return false;
+    }
+
+    if (!SHH::Simulation::Behavior::Init())
+    {
+	SHH::Log::Error("SHH::Simulation::Init(): Could not init behaviors.");
+	delete[] environmentList;
+	environmentList = nullptr;
 	delete[] objectList;
 	objectList = nullptr;
 	return false;
@@ -82,19 +98,16 @@ void SHH::Simulation::Deinit()
 	environmentList = nullptr;
     }
 
+    SHH::Simulation::Behavior::Deinit();
+
     SHH::Log::Log("SHH::Simulation::Deinit(): Ended successfully.");
 }
 
 void SHH::Simulation::Update()
 {
-    float frameTime = SHH::ProgramController::GetFrameTime();
-    for (int i = 0; i < OBJECT_LIST_SIZE; ++i)
-    {
-	objectList[i].xspeed += objectList[i].xaccel * frameTime;
-	objectList[i].yspeed += objectList[i].yaccel * frameTime;
-	objectList[i].x += objectList[i].xspeed * frameTime;
-	objectList[i].y += objectList[i].yspeed * frameTime;
-    }
+    distributeIncomingMessages();
+    updateApplyBehaviors();
+    updateApplyPhysics();
 }
 
 const object* SHH::Simulation::GetObjectList()
@@ -185,4 +198,30 @@ bool SHH::Simulation::LoadMap(std::string mapname)
     SHH::Simulation::InsertObject(o3);
     SHH::Simulation::InsertObject(o4);
     return true;
+}
+
+static void distributeIncomingMessages()
+{
+    message_ctrl msg;
+    while ((msg = SHH::MessageHandler::PopControlMessage()).messagetype != MC_NOTHING && msg.messagetype < MC_MARKER_SIM)
+    {
+	SHH::Simulation::Behavior::PushControlMessage(msg);
+    }
+}
+
+static void updateApplyBehaviors()
+{
+    SHH::Simulation::Behavior::ApplyBehaviors(objectList, objectListSize);
+}
+
+static void updateApplyPhysics()
+{
+    float frameTime = SHH::ProgramController::GetFrameTime();
+    for (int i = 0; i < OBJECT_LIST_SIZE; ++i)
+    {
+	objectList[i].xspeed += objectList[i].xaccel * frameTime;
+	objectList[i].yspeed += objectList[i].yaccel * frameTime;
+	objectList[i].x += objectList[i].xspeed * frameTime;
+	objectList[i].y += objectList[i].yspeed * frameTime;
+    }
 }

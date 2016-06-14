@@ -36,7 +36,21 @@ void SHH::UI::Draw()
 
 void SHH::UI::ProcessInputs()
 {
-    
+    message_ctrl msg;
+    msg.sender = 0;
+    msg.strsize = 0;
+    msg.str = nullptr;
+
+    if (SHH::Window::IsKeyDown("left"))
+    {
+	msg.messagetype = MC_RUNLEFT;
+	SHH::MessageHandler::PushControlMessage(msg);
+    }
+    if (SHH::Window::IsKeyDown("right"))
+    {
+	msg.messagetype = MC_RUNRIGHT;
+	SHH::MessageHandler::PushControlMessage(msg);
+    }
 }
 
 static void drawFrameLoadBar()

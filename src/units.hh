@@ -20,7 +20,9 @@ enum otype
 {
     OT_NONE,
     OT_BASIC,
-    OT_PLAYER
+    OT_PLAYER,
+
+    OT_MAXVALUE
 };
 
 enum etype
@@ -38,7 +40,11 @@ enum mctype
 {
     MC_NOTHING,
     MC_RUNLEFT,
-    MC_RUNRIGHT
+    MC_RUNRIGHT,
+
+    MC_MARKER_SIM,
+
+    MC_MARKER_CTRL
 };
 
 struct object
@@ -71,4 +77,11 @@ struct message_ctrl
     uint8_t sender;
     uint8_t strsize;
     char* str;
+};
+
+// The function ordering reflects calling order
+struct behavior
+{
+    void (*OnUpdate)(object& obj);
+    void (*OnMessage)(message_ctrl const& msg, object& obj);
 };

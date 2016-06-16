@@ -53,23 +53,37 @@ static odirection checkObjectEnvironmentCollision(object const& obj, environment
 
 static void handleBehaviorRequest(object& obj, object& request)
 {
-    if (request.type != OT_NONE)
+    obj.xspeed = request.xspeed;
+    obj.xaccel = request.xaccel;
+    if (request.yspeed < 0.0f && obj.state == OS_STANDING)
     {
-	obj = request;
+	obj.yspeed = request.yspeed;
     }
 }
 
 static void updatePosition(object& obj, float ftime)
 {
+    if (obj.state == OS_IDLE)
+    {
+	obj.state = OS_FALLING;
+    }
     obj.xspeed += obj.xaccel * ftime;
     if (obj.state == OS_FALLING)
     {
-	obj.yspeed += (obj.yaccel + GRAVITY) * ftime;
+	obj.yaccel = GRAVITY;
+	obj.yspeed += obj.yaccel * ftime;
     }
-    else if (obj.state == OS_STANDING && obj.yaccel < 0.0f)
+    else if (obj.state == OS_STANDING)
     {
-	obj.yspeed += (obj.yaccel + GRAVITY) * ftime;
-	obj.state = OS_FALLING;
+	if (obj.yspeed < 0.0f)
+	{
+	    obj.state = OS_FALLING;
+	}
+	else
+	{
+	    obj.yaccel = 0.0f;
+	    obj.yspeed = 0.0f;
+	}
     }
     obj.x += obj.xspeed * ftime;
     obj.y += obj.yspeed * ftime;
@@ -80,24 +94,21 @@ static void handleEnvironmentCollisions(object& obj, environment* elist, int eli
     bool stillStanding = false;
     for (int j = 0; j < elistsize; ++j)
     {
-	odirection cdir = checkObjectEnvironmentCollision(obj, elist[j]);
+	environment& env = elist[j];
+	odirection cdir = checkObjectEnvironmentCollision(obj, env);
 	switch (cdir)
 	{
 	case OD_NOWHERE:
 	    break;
 	case OD_UP:
-	    obj.y = elist[j].y + elist[j].height;
+	    obj.y = env.y + env.height;
 	    if (obj.yspeed < 0.0f)
 	    {
 		obj.yspeed = 0.0f;
 	    }
-	    if (obj.yaccel < 0.0f)
-	    {
-		obj.yaccel = 0;
-	    }
 	    break;
 	case OD_RIGHT:
-	    obj.x = elist[j].x - obj.width;
+	    obj.x = env.x - obj.width;
 	    obj.xspeed = 0.0f;
 	    if (obj.xaccel > 0.0f)
 	    {
@@ -105,20 +116,17 @@ static void handleEnvironmentCollisions(object& obj, environment* elist, int eli
 	    }
 	    break;
 	case OD_DOWN:
+	    stillStanding = true;
 	    if (obj.state == OS_FALLING)
 	    {
-		obj.y = elist[j].y - obj.height;
+		obj.y = env.y - obj.height;
 		obj.yspeed = 0.0f;
-		if (obj.yaccel >= 0.0f)
-		{
-		    obj.yaccel = 0.0f;
-		    obj.state = OS_STANDING;
-		    stillStanding = true;
-		}
+		obj.yaccel = 0.0f;
+		obj.state = OS_STANDING;
 	    }
 	    break;
 	case OD_LEFT:
-	    obj.x = elist[j].x + elist[j].width;
+	    obj.x = env.x + env.width;
 	    obj.xspeed = 0.0f;
 	    if (obj.xaccel < 0.0f)
 	    {
@@ -130,19 +138,8 @@ static void handleEnvironmentCollisions(object& obj, environment* elist, int eli
 	}
     }
 
-    switch (obj.state)
+    if (obj.state == OS_STANDING && !stillStanding)
     {
-    case OS_IDLE:
 	obj.state = OS_FALLING;
-    case OS_STANDING:
-	if (!stillStanding)
-	{
-	    obj.state = OS_FALLING;
-	}
-	break;
-    case OS_FALLING:
-	break;
-    default:
-	break;
     }
 }

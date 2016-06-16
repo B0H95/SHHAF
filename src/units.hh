@@ -35,6 +35,7 @@ enum etype
 
 enum mstype
 {
+    MS_NOTHING,
     MS_OBJECTUPDATE
 };
 
@@ -50,11 +51,19 @@ enum mctype
     MC_MARKER_CTRL
 };
 
+enum messaging_mode
+{
+    MM_OFFLINE,
+    MM_CLIENT,
+    MM_SERVER
+};
+
 struct object
 {
     otype type;
     ostate state;
     odirection direction;
+    uint32_t syncindex;
     float xaccel,yaccel,xspeed,yspeed,x,y,width,height;
 };
 
@@ -67,11 +76,7 @@ struct environment
 struct message_sim
 {
     mstype messagetype;
-    otype objecttype;
-    odirection direction;
-    ostate state;
-    uint32_t index;
-    float x,y,xspeed,yspeed,xaccel,yaccel,width,height;
+    object obj;
 };
 
 struct message_ctrl

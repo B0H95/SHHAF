@@ -7,6 +7,9 @@
 #include "programcontroller.hh"
 #include "messagehandler.hh"
 
+static int newObjectIndex = 1;
+static messaging_mode messagingMode = MM_CLIENT;
+
 static const int OBJECT_LIST_SIZE = 100;
 static object* objectList = nullptr;
 static object* objectBehaviorRequests = nullptr;
@@ -16,9 +19,11 @@ static const int ENVIRONMENT_LIST_SIZE = 100;
 static environment* environmentList = nullptr;
 static int environmentListSize = 0;
 
-static void distributeIncomingMessages();
+static void distributeIncomingControlMessages();
 static void updateApplyBehaviors();
 static void updateApplyPhysics();
+static void handleIncomingSimulationMessages();
+static bool insertUnsynchedObject(object const& obj);
 
 bool SHH::Simulation::Init()
 {
@@ -124,7 +129,11 @@ void SHH::Simulation::Deinit()
 
 void SHH::Simulation::Update()
 {
-    distributeIncomingMessages();
+    distributeIncomingControlMessages();
+    if (messagingMode == MM_CLIENT)
+    {
+	handleIncomingSimulationMessages();
+    }
     updateApplyBehaviors();
     updateApplyPhysics();
 }
@@ -157,19 +166,14 @@ bool SHH::Simulation::InsertObject(object const& obj)
 	return false;
     }
 
-    int freeIndex;
-    for (freeIndex = 0; freeIndex < OBJECT_LIST_SIZE; ++freeIndex)
-    {
-	if (objectList[freeIndex].type == OT_NONE) break;
-    }
-
-    if (freeIndex == OBJECT_LIST_SIZE)
+    if (objectListSize >= OBJECT_LIST_SIZE)
     {
 	SHH::Log::Warning("SHH::Simulation::InsertObject(): No space left in objectList.");
 	return false;
     }
 
-    objectList[freeIndex] = obj;
+    objectList[objectListSize] = obj;
+    objectList[objectListSize].syncindex = newObjectIndex++;
     ++objectListSize;
     return true;
 }
@@ -212,7 +216,12 @@ bool SHH::Simulation::LoadMap(std::string mapname)
     return true;
 }
 
-static void distributeIncomingMessages()
+void SHH::Simulation::SetMessagingMode(messaging_mode sm)
+{
+    messagingMode = sm;
+}
+
+static void distributeIncomingControlMessages()
 {
     message_ctrl msg;
     while ((msg = SHH::MessageHandler::PopControlMessage()).messagetype != MC_NOTHING && msg.messagetype < MC_MARKER_SIM)
@@ -229,4 +238,47 @@ static void updateApplyBehaviors()
 static void updateApplyPhysics()
 {
     SHH::Simulation::Physics::ApplyPhysics(objectList, objectBehaviorRequests, objectListSize, environmentList, environmentListSize);
+}
+
+static void handleIncomingSimulationMessages()
+{
+    message_sim msg;
+    while ((msg = SHH::MessageHandler::PopSimulationMessage()).messagetype != MS_NOTHING)
+    {
+	//TODO: Fix different actions for different message types (if there will ever be any)
+	bool objectFound = false;
+	for (int i = 0; i < objectListSize; ++i)
+	{
+	    if (objectList[i].syncindex == msg.obj.syncindex)
+	    {
+		objectFound = true;
+		objectList[i] = msg.obj; //TODO: Fix interpolation
+		break;
+	    }
+	}
+	
+	if (!objectFound)
+	{
+	    insertUnsynchedObject(msg.obj);
+	}
+    }
+}
+
+static bool insertUnsynchedObject(object const& obj)
+{
+    if (objectList == nullptr)
+    {
+	SHH::Log::Warning("SHH::Simulation insertUnsynchedObject(): No memory allocated for objectList.");
+	return false;
+    }
+
+    if (objectListSize >= OBJECT_LIST_SIZE)
+    {
+	SHH::Log::Warning("SHH::Simulation insertUnsynchedObject(): No space left in objectList.");
+	return false;
+    }
+
+    objectList[objectListSize] = obj;
+    ++objectListSize;
+    return true;
 }

@@ -5,6 +5,7 @@ void SHH::Units::CreateNoneObject(object& obj)
     obj.type = OT_NONE;
     obj.state = OS_IDLE;
     obj.direction = OD_NOWHERE;
+    obj.syncindex = 0;
     obj.x = 0.0f;
     obj.y = 0.0f;
     obj.xspeed = 0.0f;
@@ -40,12 +41,12 @@ environment SHH::Units::CreateSolidEnvironment(float x, float y, float w, float 
 
 object SHH::Units::CreateBasicObject(float x, float y, float w, float h)
 {
-    object o = {OT_BASIC,OS_IDLE,OD_NOWHERE,0.0f,0.0f,0.0f,0.0f,x,y,w,h};
+    object o = {OT_BASIC,OS_IDLE,OD_NOWHERE,0,0.0f,0.0f,0.0f,0.0f,x,y,w,h};
     return o;
 }
 
 object SHH::Units::CreatePlayerObject(float x, float y, float w, float h)
 {
-    object o = {OT_PLAYER,OS_IDLE,OD_NOWHERE,0.0f,0.0f,0.0f,0.0f,x,y,w,h};
+    object o = {OT_PLAYER,OS_IDLE,OD_NOWHERE,0,0.0f,0.0f,0.0f,0.0f,x,y,w,h};
     return o;
 }

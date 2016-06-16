@@ -25,7 +25,6 @@ void SHH::Simulation::Physics::Deinit()
 
 void SHH::Simulation::Physics::ApplyPhysics(object* olist, object* obrlist, int olistsize, environment* elist, int elistsize)
 {
-    //TODO: Fix standing on walls
     float frameTime = SHH::ProgramController::GetFrameTime();
     for (int i = 0; i < olistsize; ++i)
     {
@@ -117,7 +116,7 @@ static void handleEnvironmentCollisions(object& obj, environment* elist, int eli
 	    break;
 	case OD_DOWN:
 	    stillStanding = true;
-	    if (obj.state == OS_FALLING)
+	    if (obj.state == OS_FALLING && obj.yspeed > 0.0f)
 	    {
 		obj.y = env.y - obj.height;
 		obj.yspeed = 0.0f;

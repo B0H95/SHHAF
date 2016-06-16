@@ -18,5 +18,6 @@ namespace SHH
 	bool InsertObject(object const& obj);
 	bool InsertEnvironment(environment const& obj);
 	bool LoadMap(std::string mapname);
+	void SetMessagingMode(messaging_mode sm);
     }
 }

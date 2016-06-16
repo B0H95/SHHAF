@@ -5,7 +5,10 @@
 
 static const float GRAVITY = 300.0f;
 
-odirection checkObjectEnvironmentCollision(object const& obj, environment const& env);
+static odirection checkObjectEnvironmentCollision(object const& obj, environment const& env);
+static void handleBehaviorRequest(object& obj, object& request);
+static void updatePosition(object& obj, float ftime);
+static void handleEnvironmentCollisions(object& obj, environment* elist, int elistsize);
 
 bool SHH::Simulation::Physics::Init()
 {
@@ -20,98 +23,19 @@ void SHH::Simulation::Physics::Deinit()
     SHH::Log::Log("SHH::Simulation::Physics::Deinit(): Ended successfully.");
 }
 
-void SHH::Simulation::Physics::ApplyPhysics(object* olist, int olistsize, environment* elist, int elistsize)
+void SHH::Simulation::Physics::ApplyPhysics(object* olist, object* obrlist, int olistsize, environment* elist, int elistsize)
 {
     //TODO: Fix standing on walls
     float frameTime = SHH::ProgramController::GetFrameTime();
     for (int i = 0; i < olistsize; ++i)
     {
-	olist[i].xspeed += olist[i].xaccel * frameTime;
-	if (olist[i].state == OS_FALLING)
-	{
-	    olist[i].yspeed += (olist[i].yaccel + GRAVITY) * frameTime;
-	}
-	else if (olist[i].state == OS_STANDING && olist[i].yaccel < 0.0f)
-	{
-	    olist[i].yspeed += (olist[i].yaccel + GRAVITY) * frameTime;
-	    olist[i].state = OS_FALLING;
-	}
-	olist[i].x += olist[i].xspeed * frameTime;
-	olist[i].y += olist[i].yspeed * frameTime;
-
-	bool stillStanding = false;
-	for (int j = 0; j < elistsize; ++j)
-	{
-	    odirection cdir = checkObjectEnvironmentCollision(olist[i], elist[j]);
-	    switch (cdir)
-	    {
-	    case OD_NOWHERE:
-		break;
-	    case OD_UP:
-		olist[i].y = elist[j].y + elist[j].height;
-		if (olist[i].yspeed < 0.0f)
-		{
-		    olist[i].yspeed = 0.0f;
-		}
-		if (olist[i].yaccel < 0.0f)
-		{
-		    olist[i].yaccel = 0;
-		}
-		break;
-	    case OD_RIGHT:
-		olist[i].x = elist[j].x - olist[i].width;
-		olist[i].xspeed = 0.0f;
-		if (olist[i].xaccel > 0.0f)
-		{
-		    olist[i].xaccel = 0;
-		}
-		break;
-	    case OD_DOWN:
-		if (olist[i].state == OS_FALLING)
-		{
-		    olist[i].y = elist[j].y - olist[i].height;
-		    olist[i].yspeed = 0.0f;
-		    if (olist[i].yaccel >= 0.0f)
-		    {
-			olist[i].yaccel = 0.0f;
-			olist[i].state = OS_STANDING;
-			stillStanding = true;
-		    }
-		}
-		break;
-	    case OD_LEFT:
-		olist[i].x = elist[j].x + elist[j].width;
-		olist[i].xspeed = 0.0f;
-		if (olist[i].xaccel < 0.0f)
-		{
-		    olist[i].xaccel = 0;
-		}
-		break;
-	    default:
-		break;
-	    }
-	}
-
-        
-	switch (olist[i].state)
-	{
-	case OS_IDLE:
-	    olist[i].state = OS_FALLING;
-	case OS_STANDING:
-	    if (!stillStanding)
-	    {
-		olist[i].state = OS_FALLING;
-	    }
-	    break;
-	case OS_FALLING:
-	    break;
-	default:
-	    break;
-        }
+	handleBehaviorRequest(olist[i], obrlist[i]);
+	updatePosition(olist[i], frameTime);
+	handleEnvironmentCollisions(olist[i], elist, elistsize);	
     }
 }
 
-odirection checkObjectEnvironmentCollision(object const& obj, environment const& env)
+static odirection checkObjectEnvironmentCollision(object const& obj, environment const& env)
 {
     float right = env.x - (obj.x+obj.width);
     float left = obj.x - (env.x+env.width);
@@ -125,4 +49,100 @@ odirection checkObjectEnvironmentCollision(object const& obj, environment const&
 	else return OD_DOWN;
     }
     return OD_NOWHERE;
+}
+
+static void handleBehaviorRequest(object& obj, object& request)
+{
+    if (request.type != OT_NONE)
+    {
+	obj = request;
+    }
+}
+
+static void updatePosition(object& obj, float ftime)
+{
+    obj.xspeed += obj.xaccel * ftime;
+    if (obj.state == OS_FALLING)
+    {
+	obj.yspeed += (obj.yaccel + GRAVITY) * ftime;
+    }
+    else if (obj.state == OS_STANDING && obj.yaccel < 0.0f)
+    {
+	obj.yspeed += (obj.yaccel + GRAVITY) * ftime;
+	obj.state = OS_FALLING;
+    }
+    obj.x += obj.xspeed * ftime;
+    obj.y += obj.yspeed * ftime;
+}
+
+static void handleEnvironmentCollisions(object& obj, environment* elist, int elistsize)
+{
+    bool stillStanding = false;
+    for (int j = 0; j < elistsize; ++j)
+    {
+	odirection cdir = checkObjectEnvironmentCollision(obj, elist[j]);
+	switch (cdir)
+	{
+	case OD_NOWHERE:
+	    break;
+	case OD_UP:
+	    obj.y = elist[j].y + elist[j].height;
+	    if (obj.yspeed < 0.0f)
+	    {
+		obj.yspeed = 0.0f;
+	    }
+	    if (obj.yaccel < 0.0f)
+	    {
+		obj.yaccel = 0;
+	    }
+	    break;
+	case OD_RIGHT:
+	    obj.x = elist[j].x - obj.width;
+	    obj.xspeed = 0.0f;
+	    if (obj.xaccel > 0.0f)
+	    {
+		obj.xaccel = 0;
+	    }
+	    break;
+	case OD_DOWN:
+	    if (obj.state == OS_FALLING)
+	    {
+		obj.y = elist[j].y - obj.height;
+		obj.yspeed = 0.0f;
+		if (obj.yaccel >= 0.0f)
+		{
+		    obj.yaccel = 0.0f;
+		    obj.state = OS_STANDING;
+		    stillStanding = true;
+		}
+	    }
+	    break;
+	case OD_LEFT:
+	    obj.x = elist[j].x + elist[j].width;
+	    obj.xspeed = 0.0f;
+	    if (obj.xaccel < 0.0f)
+	    {
+		obj.xaccel = 0;
+	    }
+	    break;
+	default:
+	    break;
+	}
+    }
+
+    switch (obj.state)
+    {
+    case OS_IDLE:
+	obj.state = OS_FALLING;
+    case OS_STANDING:
+	if (!stillStanding)
+	{
+	    obj.state = OS_FALLING;
+	}
+	break;
+    case OS_FALLING:
+	break;
+    default:
+	break;
+    }
 }

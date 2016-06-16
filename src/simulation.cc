@@ -9,6 +9,7 @@
 
 static const int OBJECT_LIST_SIZE = 100;
 static object* objectList = nullptr;
+static object* objectBehaviorRequests = nullptr;
 static int objectListSize = 0;
 
 static const int ENVIRONMENT_LIST_SIZE = 100;
@@ -60,6 +61,19 @@ bool SHH::Simulation::Init()
 	return false;
     }
 
+    objectBehaviorRequests = new object [OBJECT_LIST_SIZE];
+    if (objectBehaviorRequests == nullptr)
+    {
+	SHH::Log::Error("SHH::Simulation::Init(): Could not allocate memory for objectBehaviorRequests.");
+	SHH::Simulation::Physics::Deinit();
+	SHH::Simulation::Behavior::Deinit();
+	delete[] environmentList;
+	environmentList = nullptr;
+	delete[] objectList;
+	objectList = nullptr;
+	return false;
+    }
+
     for (int i = 0; i < OBJECT_LIST_SIZE; ++i)
     {
 	SHH::Units::CreateNoneObject(objectList[i]);
@@ -88,6 +102,12 @@ void SHH::Simulation::Deinit()
     {
 	delete[] objectList;
 	objectList = nullptr;
+    }
+
+    if (objectBehaviorRequests != nullptr)
+    {
+	delete[] objectBehaviorRequests;
+	objectBehaviorRequests = nullptr;
     }
 
     if (environmentList != nullptr)
@@ -203,10 +223,10 @@ static void distributeIncomingMessages()
 
 static void updateApplyBehaviors()
 {
-    SHH::Simulation::Behavior::ApplyBehaviors(objectList, objectListSize);
+    SHH::Simulation::Behavior::ApplyBehaviors(objectList, objectBehaviorRequests, objectListSize);
 }
 
 static void updateApplyPhysics()
 {
-    SHH::Simulation::Physics::ApplyPhysics(objectList, objectListSize, environmentList, environmentListSize);
+    SHH::Simulation::Physics::ApplyPhysics(objectList, objectBehaviorRequests, objectListSize, environmentList, environmentListSize);
 }

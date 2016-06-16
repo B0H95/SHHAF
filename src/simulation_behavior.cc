@@ -68,20 +68,24 @@ bool SHH::Simulation::Behavior::PushControlMessage(message_ctrl const& msg)
     return true;
 }
 
-void SHH::Simulation::Behavior::ApplyBehaviors(object* olist, int olistsize)
+void SHH::Simulation::Behavior::ApplyBehaviors(object* olist, object* obrlist, int olistsize)
 {
     for (int i = 0; i < olistsize; ++i)
     {
 	otype type = olist[i].type;
-	if (!(behaviorList[type].OnUpdate == nullptr))
+	if (type != OT_NONE)
 	{
-	    behaviorList[type].OnUpdate(olist[i]);
+	    obrlist[i] = olist[i];
+        }
+	if (behaviorList[type].OnUpdate != nullptr)
+	{
+	    behaviorList[type].OnUpdate(obrlist[i]);
 	}
-	if (!(behaviorList[type].OnMessage == nullptr))
+	if (behaviorList[type].OnMessage != nullptr)
 	{
 	    for (int j = controlEventListStart; j != controlEventListEnd; j = (j + 1) % CONTROL_EVENT_LIST_MAXSIZE)
 	    {
-		behaviorList[type].OnMessage(controlEventList[j], olist[i]);
+		behaviorList[type].OnMessage(controlEventList[j], obrlist[i]);
 	    }
 	}
     }

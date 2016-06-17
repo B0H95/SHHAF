@@ -8,7 +8,7 @@
 #include "messagehandler.hh"
 
 static int newObjectIndex = 1;
-static messaging_mode messagingMode = MM_CLIENT;
+static messaging_mode messagingMode = MM_OFFLINE;
 
 static const int OBJECT_LIST_SIZE = 100;
 static object* objectList = nullptr;
@@ -24,6 +24,7 @@ static void updateApplyBehaviors();
 static void updateApplyPhysics();
 static void handleIncomingSimulationMessages();
 static bool insertUnsynchedObject(object const& obj);
+static void sendObjectUpdates();
 
 bool SHH::Simulation::Init()
 {
@@ -136,6 +137,10 @@ void SHH::Simulation::Update()
     }
     updateApplyBehaviors();
     updateApplyPhysics();
+    if (messagingMode == MM_SERVER)
+    {
+	sendObjectUpdates();
+    }
 }
 
 const object* SHH::Simulation::GetObjectList()
@@ -170,6 +175,12 @@ bool SHH::Simulation::InsertObject(object const& obj)
     {
 	SHH::Log::Warning("SHH::Simulation::InsertObject(): No space left in objectList.");
 	return false;
+    }
+
+    if (messagingMode == MM_CLIENT)
+    {
+	SHH::Log::Warning("SHH::Simulation::InsertObject(): Can not add objects in client mode.");
+	return false;	
     }
 
     objectList[objectListSize] = obj;
@@ -224,7 +235,7 @@ void SHH::Simulation::SetMessagingMode(messaging_mode sm)
 static void distributeIncomingControlMessages()
 {
     message_ctrl msg;
-    while ((msg = SHH::MessageHandler::PopControlMessage()).messagetype != MC_NOTHING && msg.messagetype < MC_MARKER_SIM)
+    while ((msg = SHH::MessageHandler::PopIncomingControlMessage()).messagetype != MC_NOTHING && msg.messagetype < MC_MARKER_SIM)
     {
 	SHH::Simulation::Behavior::PushControlMessage(msg);
     }
@@ -281,4 +292,15 @@ static bool insertUnsynchedObject(object const& obj)
     objectList[objectListSize] = obj;
     ++objectListSize;
     return true;
+}
+
+static void sendObjectUpdates()
+{
+    message_sim msg;
+    msg.messagetype = MS_OBJECTUPDATE;
+    for (int i = 0; i < objectListSize; ++i)
+    {
+	msg.obj = objectList[i];
+	SHH::MessageHandler::PushSimulationMessage(msg);
+    }
 }

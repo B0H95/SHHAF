@@ -58,6 +58,11 @@ void SHH::MessageHandler::SetMessagingMode(messaging_mode mmode)
     messagingMode = mmode;
 }
 
+messaging_mode SHH::MessageHandler::GetMessagingMode()
+{
+    return messagingMode;
+}
+
 bool SHH::MessageHandler::PushControlMessage(message_ctrl const& msg)
 {
     if (messagingMode == MM_CLIENT && !outqueueCtrl.Push(msg))

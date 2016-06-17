@@ -8,6 +8,7 @@
 #include "ui.hh"
 #include "simulation.hh"
 #include "messagehandler.hh"
+#include "networkcontroller.hh"
 
 static bool running = true;
 static int argumentCount;
@@ -56,6 +57,16 @@ bool SHH::ProgramController::Init(int argc, char* argv[])
 	return false;
     }
 
+    if (!SHH::NetworkController::Init())
+    {
+	SHH::Log::Error("SHH::ProgramController::Init(): Could not init network controller.");
+	SHH::MessageHandler::Deinit();
+	SHH::Simulation::Deinit();
+	SHH::UI::Deinit();
+	SHH::Window::Deinit();
+	return false;
+    }
+
     SHH::Log::Log("SHH::ProgramController::Init(): Ended successfully.");
     return true;
 }
@@ -63,6 +74,9 @@ bool SHH::ProgramController::Init(int argc, char* argv[])
 bool SHH::ProgramController::Postinit()
 {
     SHH::Log::Log("SHH::ProgramController::Postinit(): Start.");
+
+    SHH::Simulation::SetMessagingMode(MM_OFFLINE);
+    SHH::MessageHandler::SetMessagingMode(MM_OFFLINE);
 
     if (!SHH::Simulation::Postinit())
     {
@@ -78,6 +92,7 @@ void SHH::ProgramController::Deinit()
 {
     SHH::Log::Log("SHH::ProgramController::Deinit(): Start.");
 
+    SHH::NetworkController::Deinit();
     SHH::MessageHandler::Deinit();
     SHH::Simulation::Deinit();
     SHH::UI::Deinit();
@@ -89,6 +104,11 @@ void SHH::ProgramController::Deinit()
 void SHH::ProgramController::Run()
 {
     SHH::Log::Log("SHH::ProgramController::Run(): Start.");
+
+    if (!SHH::NetworkController::Run())
+    {
+	SHH::Log::Warning("SHH::ProgramController::Run(): Could not run network controller.");
+    }
 
     while (running)
     {
@@ -108,6 +128,8 @@ void SHH::ProgramController::Run()
 	    frameTime = frameRateTime;
 	}
     }
+
+    SHH::NetworkController::Stop();
 
     SHH::Log::Log("SHH::ProgramController::Run(): Ended successfully.");
 }

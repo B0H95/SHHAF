@@ -18,6 +18,7 @@ static int currentFontCharHeight = 0;
 static int currentFontCharWidth = 0;
 
 static const Uint8* keystate = nullptr;
+static Uint8 previousKeystates [SDL_NUM_SCANCODES];
 
 bool SHH::Window::Init(int width, int height, std::string name)
 {
@@ -59,6 +60,10 @@ bool SHH::Window::Init(int width, int height, std::string name)
     windowHeight = height;
 
     keystate = SDL_GetKeyboardState(nullptr);
+    for (int i = 0; i < SDL_NUM_SCANCODES; ++i)
+    {
+	previousKeystates[i] = 0;
+    }
 
     SHH::Log::Log("SHH::Window::Init(): Ended successfully.");
     return true;
@@ -92,6 +97,10 @@ void SHH::Window::Deinit()
 
 void SHH::Window::ProcessEvents()
 {
+    for (int i = 0; i < SDL_NUM_SCANCODES; ++i)
+    {
+	previousKeystates[i] = keystate[i];
+    }
     while (SDL_PollEvent(&event) != 0)
     {
 	if (event.type == SDL_QUIT)
@@ -104,6 +113,18 @@ void SHH::Window::ProcessEvents()
 bool SHH::Window::IsKeyDown(const char* keyname)
 {
     return keystate[SDL_GetScancodeFromKey(SDL_GetKeyFromName(keyname))] == 1;
+}
+
+bool SHH::Window::IsKeyPressed(const char* keyname)
+{
+    int scancode = SDL_GetScancodeFromKey(SDL_GetKeyFromName(keyname));
+    return keystate[scancode] == 1 && previousKeystates[scancode] == 0;
+}
+
+bool SHH::Window::IsKeyReleased(const char* keyname)
+{
+    int scancode = SDL_GetScancodeFromKey(SDL_GetKeyFromName(keyname));
+    return keystate[scancode] == 0 && previousKeystates[scancode] == 1;
 }
 
 int SHH::Window::GetWindowWidth()

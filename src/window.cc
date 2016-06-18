@@ -19,6 +19,7 @@ static int currentFontCharWidth = 0;
 
 static const Uint8* keystate = nullptr;
 static Uint8 previousKeystates [SDL_NUM_SCANCODES];
+static SDL_Keycode currentKey = 0;
 
 bool SHH::Window::Init(int width, int height, std::string name)
 {
@@ -97,15 +98,16 @@ void SHH::Window::Deinit()
 
 void SHH::Window::ProcessEvents()
 {
-    for (int i = 0; i < SDL_NUM_SCANCODES; ++i)
-    {
-	previousKeystates[i] = keystate[i];
-    }
+    currentKey = 0;
     while (SDL_PollEvent(&event) != 0)
     {
 	if (event.type == SDL_QUIT)
 	{
 	    SHH::ProgramController::Quit();
+	}
+	else if (event.type == SDL_KEYDOWN)
+	{
+	    currentKey = event.key.keysym.sym;
 	}
     }
 }
@@ -125,6 +127,15 @@ bool SHH::Window::IsKeyReleased(const char* keyname)
 {
     int scancode = SDL_GetScancodeFromKey(SDL_GetKeyFromName(keyname));
     return keystate[scancode] == 0 && previousKeystates[scancode] == 1;
+}
+
+std::string SHH::Window::GetCurrentKey()
+{
+    if (currentKey == 0)
+    {
+	return "";
+    }
+    return SDL_GetKeyName(currentKey);
 }
 
 int SHH::Window::GetWindowWidth()
@@ -200,7 +211,7 @@ void SHH::Window::DrawPoint(int x, int y)
 
 bool SHH::Window::DrawText(std::string text, int x, int y)
 {
-    if (x > windowWidth || y > windowHeight)
+    if (x > windowWidth || y > windowHeight || text.length() <= 0)
     {
 	return true;
     }

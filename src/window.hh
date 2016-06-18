@@ -13,6 +13,7 @@ namespace SHH
 	bool IsKeyDown(const char* keyname);
 	bool IsKeyPressed(const char* keyname);
 	bool IsKeyReleased(const char* keyname);
+	std::string GetCurrentKey();
 	int GetWindowWidth();
 	int GetWindowHeight();
 	void SetColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a);

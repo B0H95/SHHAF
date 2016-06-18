@@ -13,6 +13,13 @@ static void drawSimulation();
 bool SHH::UI::Init()
 {
     SHH::Log::Log("SHH::UI::Init(): Started.");
+
+    if (!SHH::Window::LoadFont("res/fonts/default.ttf", 12))
+    {
+	SHH::Log::Error("SHH::UI::Init(): Could not load default font.");
+	return false;
+    }
+
     SHH::Log::Log("SHH::UI::Init(): Ended successfully.");
     return true;
 }

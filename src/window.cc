@@ -1,6 +1,7 @@
 #include "window.hh"
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include "programcontroller.hh"
 #include "log.hh"
 
@@ -10,6 +11,11 @@ static SDL_Event event;
 
 static int windowWidth;
 static int windowHeight;
+
+static SDL_Color currentColor = {0, 0, 0, 0};
+static TTF_Font* currentFont = nullptr;
+static int currentFontCharHeight = 0;
+static int currentFontCharWidth = 0;
 
 static const Uint8* keystate = nullptr;
 
@@ -39,6 +45,15 @@ bool SHH::Window::Init(int width, int height, std::string name)
 	SDL_Quit();
 	return false;
     }
+
+    if (TTF_Init() == -1)
+    {
+	SHH::Log::Error("SHH::Window::Init(): TTF_Init() failed.");
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
+	SDL_Quit();
+	return false;
+    }
     
     windowWidth = width;
     windowHeight = height;
@@ -53,6 +68,13 @@ void SHH::Window::Deinit()
 {
     SHH::Log::Log("SHH::Window::Deinit(): Start.");
 
+    if (currentFont != nullptr)
+    {
+	TTF_CloseFont(currentFont);
+    }
+
+    TTF_Quit();
+
     if (renderer != nullptr)
     {
 	SDL_DestroyRenderer(renderer);
@@ -62,6 +84,7 @@ void SHH::Window::Deinit()
     {
 	SDL_DestroyWindow(window);
     }
+
     SDL_Quit();
 
     SHH::Log::Log("SHH::Window::Deinit(): Ended successfully.");
@@ -96,6 +119,30 @@ int SHH::Window::GetWindowHeight()
 void SHH::Window::SetColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
     SDL_SetRenderDrawColor(renderer, r, g, b, a);
+    currentColor = {r, g, b, a};
+}
+
+bool SHH::Window::LoadFont(std::string name, int size)
+{
+    if (currentFont != nullptr)
+    {
+	TTF_CloseFont(currentFont);
+    }
+    currentFont = TTF_OpenFont(name.c_str(), size);
+    if (currentFont == nullptr)
+    {
+	SHH::Log::Error("SHH::Window::LoadFont(): Could not load font.");
+	return false;
+    }
+    currentFontCharHeight = size;
+    currentFontCharWidth = size;
+    return true;
+}
+
+void SHH::Window::SetFontCharSize(int width, int height)
+{
+    currentFontCharWidth = width;
+    currentFontCharHeight = height;
 }
 
 void SHH::Window::ClearScreen()
@@ -128,4 +175,27 @@ void SHH::Window::DrawLine(int x1, int y1, int x2, int y2)
 void SHH::Window::DrawPoint(int x, int y)
 {
     SDL_RenderDrawPoint(renderer, x, y);
+}
+
+bool SHH::Window::DrawText(std::string text, int x, int y)
+{
+    if (x > windowWidth || y > windowHeight)
+    {
+	return true;
+    }
+    SDL_Surface* textSurface = TTF_RenderText_Solid(currentFont, text.c_str(), currentColor);
+    if (textSurface == nullptr)
+    {
+	SHH::Log::Error("SHH::Window::DrawText(): TTF_RenderText_Solid failed.");
+	return false;
+    }
+    SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+    if (textTexture == nullptr)
+    {
+	SHH::Log::Error("SHH::Window::DrawText(): SDL_CreateTextureFromSurface failed.");
+	return false;
+    }
+    SDL_Rect rect = {x, y, (int)(currentFontCharWidth * text.length()), currentFontCharHeight};
+    SDL_RenderCopy(renderer, textTexture, nullptr, &rect);
+    return true;
 }

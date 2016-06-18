@@ -3,6 +3,7 @@
 #include <thread>
 #include "log.hh"
 #include "messagehandler.hh"
+#include "udpsocket.hh"
 
 static bool running = true;
 static std::thread* netthread = nullptr;
@@ -12,6 +13,13 @@ static void networkThreadMain();
 bool SHH::NetworkController::Init()
 {
     SHH::Log::Log("SHH::NetworkController::Init(): Started.");
+    
+    if (!SHH::UDP::Init(512))
+    {
+	SHH::Log::Error("SHH::NetworkController::Init(): Could not init UDP.");
+	return false;
+    }
+
     SHH::Log::Log("SHH::NetworkController::Init(): Ended successfully.");
     return true;
 }
@@ -29,6 +37,8 @@ void SHH::NetworkController::Deinit()
 	delete netthread;
 	netthread = nullptr;
     }
+
+    SHH::UDP::Deinit();
 
     SHH::Log::Log("SHH::NetworkController::Deinit(): Ended successfully.");
 }

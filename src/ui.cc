@@ -1,5 +1,6 @@
 #include "ui.hh"
 
+#include <string>
 #include "log.hh"
 #include "window.hh"
 #include "programcontroller.hh"
@@ -9,6 +10,7 @@
 
 static void drawFrameLoadBar();
 static void drawSimulation();
+static void drawConsole();
 
 bool SHH::UI::Init()
 {
@@ -37,7 +39,8 @@ void SHH::UI::Draw()
 
     drawSimulation();
     drawFrameLoadBar();
-    
+    drawConsole();
+
     SHH::Window::UpdateScreen();
 }
 
@@ -110,5 +113,19 @@ static void drawSimulation()
 	    int y2 = int(environmentList[i].y + environmentList[i].height);
 	    SHH::Window::DrawFilledRectangle(x1, y1, x2, y2);
 	}
+    }
+}
+
+static void drawConsole()
+{
+    const int fontHeight = 16;
+    const int amountOfLines = SHH::Window::GetWindowHeight() / (fontHeight * 2);
+
+    SHH::Window::SetFontCharSize(8, fontHeight);
+    SHH::Window::SetColor(0xFF, 0xFF, 0xFF, 0xFF);
+
+    for (int i = 0; i < amountOfLines; ++i)
+    {
+	SHH::Window::DrawText(SHH::Log::GetLogEntry(amountOfLines - i - 1), 0, i * fontHeight);
     }
 }

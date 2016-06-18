@@ -11,5 +11,6 @@ namespace SHH
 	void Log(std::string str);
 	void Warning(std::string str);
 	void Error(std::string str);
+	std::string GetLogEntry(int logentry);
     }
 }

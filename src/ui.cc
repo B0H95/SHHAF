@@ -16,7 +16,7 @@ bool SHH::UI::Init()
 {
     SHH::Log::Log("SHH::UI::Init(): Started.");
 
-    if (!SHH::Window::LoadFont("res/fonts/default.ttf", 12))
+    if (!SHH::Window::LoadFont("res/fonts/default.ttf", 24))
     {
 	SHH::Log::Error("SHH::UI::Init(): Could not load default font.");
 	return false;

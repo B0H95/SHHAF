@@ -1,7 +1,8 @@
 #include "window.hh"
 
+#include "window_resources.hh"
+
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
 #include "programcontroller.hh"
 #include "log.hh"
 
@@ -13,9 +14,8 @@ static int windowWidth;
 static int windowHeight;
 
 static SDL_Color currentColor = {0, 0, 0, 0};
-static TTF_Font* currentFont = nullptr;
-static int currentFontCharHeight = 0;
-static int currentFontCharWidth = 0;
+static int fontCharDrawHeight = 0;
+static int fontCharDrawWidth = 0;
 
 static const Uint8* keystate = nullptr;
 static Uint8 previousKeystates [SDL_NUM_SCANCODES];
@@ -48,14 +48,14 @@ bool SHH::Window::Init(int width, int height, std::string name)
 	return false;
     }
 
-    if (TTF_Init() == -1)
+    if (!SHH::Window::Resources::Init(renderer))
     {
-	SHH::Log::Error("SHH::Window::Init(): TTF_Init() failed.");
+	SHH::Log::Error("SHH::Window::Init(): Could not init resources.");
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
 	return false;
-    }
+    }    
     
     windowWidth = width;
     windowHeight = height;
@@ -74,13 +74,6 @@ void SHH::Window::Deinit()
 {
     SHH::Log::Log("SHH::Window::Deinit(): Start.");
 
-    if (currentFont != nullptr)
-    {
-	TTF_CloseFont(currentFont);
-    }
-
-    TTF_Quit();
-
     if (renderer != nullptr)
     {
 	SDL_DestroyRenderer(renderer);
@@ -90,6 +83,8 @@ void SHH::Window::Deinit()
     {
 	SDL_DestroyWindow(window);
     }
+
+    SHH::Window::Resources::Deinit();
 
     SDL_Quit();
 
@@ -156,25 +151,18 @@ void SHH::Window::SetColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 
 bool SHH::Window::LoadFont(std::string name, int size)
 {
-    if (currentFont != nullptr)
-    {
-	TTF_CloseFont(currentFont);
-    }
-    currentFont = TTF_OpenFont(name.c_str(), size);
-    if (currentFont == nullptr)
+    if (!SHH::Window::Resources::LoadFont(name, size))
     {
 	SHH::Log::Error("SHH::Window::LoadFont(): Could not load font.");
 	return false;
     }
-    currentFontCharHeight = size;
-    currentFontCharWidth = size;
     return true;
 }
 
 void SHH::Window::SetFontCharSize(int width, int height)
 {
-    currentFontCharWidth = width;
-    currentFontCharHeight = height;
+    fontCharDrawWidth = width;
+    fontCharDrawHeight = height;
 }
 
 void SHH::Window::ClearScreen()
@@ -209,25 +197,29 @@ void SHH::Window::DrawPoint(int x, int y)
     SDL_RenderDrawPoint(renderer, x, y);
 }
 
-bool SHH::Window::DrawText(std::string text, int x, int y)
+void SHH::Window::DrawText(std::string text, int x, int y)
 {
     if (x > windowWidth || y > windowHeight || text.length() <= 0)
     {
-	return true;
+	return;
     }
-    SDL_Surface* textSurface = TTF_RenderText_Solid(currentFont, text.c_str(), currentColor);
-    if (textSurface == nullptr)
+    
+    int charWidth = SHH::Window::Resources::GetFontWidth();
+    SDL_Texture* charmap = SHH::Window::Resources::GetFontCharMap();
+    SDL_Rect rect = {0, y, fontCharDrawWidth, fontCharDrawHeight};
+    SDL_Rect charmappos = {0, 0, charWidth, SHH::Window::Resources::GetFontHeight()};
+    for (int i = 0; i < (int)text.length(); ++i)
     {
-	SHH::Log::Error("SHH::Window::DrawText(): TTF_RenderText_Solid failed.");
-	return false;
+	rect.x = x + (charWidth * i);
+
+	if (rect.x >= windowWidth)
+	{
+	    return;
+	}
+
+	charmappos.x = (int)text[i] * charWidth;
+	SDL_RenderCopy(renderer, charmap, &charmappos, &rect);
     }
-    SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
-    if (textTexture == nullptr)
-    {
-	SHH::Log::Error("SHH::Window::DrawText(): SDL_CreateTextureFromSurface failed.");
-	return false;
-    }
-    SDL_Rect rect = {x, y, (int)(currentFontCharWidth * text.length()), currentFontCharHeight};
-    SDL_RenderCopy(renderer, textTexture, nullptr, &rect);
-    return true;
+    
+    return;
 }

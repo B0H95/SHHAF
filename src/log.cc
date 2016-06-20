@@ -29,6 +29,7 @@ void SHH::Log::Deinit()
     if (log != nullptr)
     {
 	delete[] log;
+	log = nullptr;
     }
 }
 
@@ -55,7 +56,7 @@ void SHH::Log::Error(std::string str)
 
 std::string SHH::Log::GetLogEntry(int logentry)
 {
-    if (logentry >= LOGSIZE)
+    if (log != nullptr && logentry >= LOGSIZE)
     {
 	return "";
     }
@@ -65,6 +66,10 @@ std::string SHH::Log::GetLogEntry(int logentry)
 
 static void LogWrite(std::string str)
 {
+    if (log == nullptr)
+    {
+	return;
+    }
     log[logpos] = str;
     logpos = (logpos + 1) % LOGSIZE;
 }

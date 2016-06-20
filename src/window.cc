@@ -74,6 +74,8 @@ bool SHH::Window::Init(int width, int height, std::string name)
 void SHH::Window::Deinit()
 {
     SHH::Log::Log("Window::Deinit(): Start.");
+    
+    SHH::Window::Resources::Deinit();
 
     if (renderer != nullptr)
     {
@@ -84,8 +86,6 @@ void SHH::Window::Deinit()
     {
 	SDL_DestroyWindow(window);
     }
-
-    SHH::Window::Resources::Deinit();
 
     SDL_Quit();
 

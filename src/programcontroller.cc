@@ -11,8 +11,8 @@
 #include "networkcontroller.hh"
 
 static bool running = true;
-static int argumentCount;
-static char** arguments;
+static int argumentCount = 0;
+static char** arguments = nullptr;
 static float frameLoad = 0.0f;
 static float frameTime = 0.0f;
 static float frameRate = 60.0;
@@ -56,7 +56,7 @@ bool SHH::ProgramController::Init(int argc, char* argv[])
 	return false;
     }
 
-    if (!SHH::NetworkController::Init())
+    if (!SHH::ProgramController::GetParameter("-nonetwork") && !SHH::NetworkController::Init())
     {
 	SHH::Log::Error("ProgramController::Init(): Could not init network controller.");
 	SHH::MessageHandler::Deinit();
@@ -90,8 +90,11 @@ bool SHH::ProgramController::Postinit()
 void SHH::ProgramController::Deinit()
 {
     SHH::Log::Log("ProgramController::Deinit(): Start.");
-
-    SHH::NetworkController::Deinit();
+    
+    if (!SHH::ProgramController::GetParameter("-nonetwork"))
+    {
+	SHH::NetworkController::Deinit();
+    }
     SHH::MessageHandler::Deinit();
     SHH::Simulation::Deinit();
     SHH::UI::Deinit();
@@ -104,11 +107,11 @@ void SHH::ProgramController::Run()
 {
     SHH::Log::Log("ProgramController::Run(): Start.");
 
-    if (!SHH::NetworkController::Run())
+    if (!SHH::ProgramController::GetParameter("-nonetwork") && !SHH::NetworkController::Run())
     {
 	SHH::Log::Warning("ProgramController::Run(): Could not run network controller.");
     }
-
+    
     while (running)
     {
 	startTime = std::chrono::high_resolution_clock::now();
@@ -128,7 +131,10 @@ void SHH::ProgramController::Run()
 	}
     }
 
-    SHH::NetworkController::Stop();
+    if (!SHH::ProgramController::GetParameter("-nonetwork"))
+    {
+	SHH::NetworkController::Stop();
+    }
 
     SHH::Log::Log("ProgramController::Run(): Ended successfully.");
 }
@@ -151,6 +157,10 @@ float SHH::ProgramController::GetFrameLoad()
 
 bool SHH::ProgramController::GetParameter(const char* param)
 {
+    if (arguments == nullptr)
+    {
+	return false;
+    }
     for (int i = 1; i < argumentCount; ++i)
     {
 	if (strcmp(param, arguments[i]) == 0)

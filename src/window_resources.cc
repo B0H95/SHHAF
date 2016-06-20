@@ -12,27 +12,27 @@ static int charHeight = 0;
 
 bool SHH::Window::Resources::Init(SDL_Renderer* currentrenderer)
 {
-    SHH::Log::Log("SHH::Window::Resources::Init(): Started.");
+    SHH::Log::Log("Window::Resources::Init(): Started.");
 
     renderer = currentrenderer;
 
     if (TTF_Init() == -1)
     {
-	SHH::Log::Error("SHH::Window::Resources::Init(): TTF_Init() failed.");
+	SHH::Log::Error("Window::Resources::Init(): TTF_Init() failed.");
 	return false;
     }
 
-    SHH::Log::Log("SHH::Window::Resources::Init(): Ended successfully.");
+    SHH::Log::Log("Window::Resources::Init(): Ended successfully.");
     return true;
 }
 
 void SHH::Window::Resources::Deinit()
 {
-    SHH::Log::Log("SHH::Window::Resources::Deinit(): Started.");
+    SHH::Log::Log("Window::Resources::Deinit(): Started.");
 
     TTF_Quit();
     
-    SHH::Log::Log("SHH::Window::Resources::Deinit(): Ended successfully.");
+    SHH::Log::Log("Window::Resources::Deinit(): Ended successfully.");
 }
 
 bool SHH::Window::Resources::LoadFont(std::string name, int height)
@@ -44,7 +44,7 @@ bool SHH::Window::Resources::LoadFont(std::string name, int height)
     font = TTF_OpenFont(name.c_str(), height);
     if (font == nullptr)
     {
-	SHH::Log::Error("SHH::Window::Resources::LoadFont(): Could not load font \"" + name + "\".");
+	SHH::Log::Error("Window::Resources::LoadFont(): Could not load font \"" + name + "\".");
 	return false;
     }
 
@@ -65,7 +65,7 @@ bool SHH::Window::Resources::LoadFont(std::string name, int height)
     SDL_Color fontcolor = {0xFF, 0xFF, 0xFF, 0xFF};    
     if (TTF_SizeText(font, charmapstr.c_str(), &charMapWidth, &charHeight) == -1)
     {
-	SHH::Log::Error("SHH::Window::Resources::LoadFont(): Could not acquire font size.");
+	SHH::Log::Error("Window::Resources::LoadFont(): Could not acquire font size.");
 	TTF_CloseFont(font);
 	return false;
     }
@@ -73,14 +73,14 @@ bool SHH::Window::Resources::LoadFont(std::string name, int height)
     SDL_Surface* textSurface = TTF_RenderText_Solid(font, charmapstr.c_str(), fontcolor);
     if (textSurface == nullptr)
     {
-	SHH::Log::Error("SHH::Window::Resources::LoadFont(): TTF_RenderText_Solid error.");
+	SHH::Log::Error("Window::Resources::LoadFont(): TTF_RenderText_Solid error.");
 	TTF_CloseFont(font);
 	return false;
     }
     fontCharMap = SDL_CreateTextureFromSurface(renderer, textSurface);
     if (fontCharMap == nullptr)
     {
-	SHH::Log::Error("SHH::Window::Resources::LoadFont(): SDL_CreateTextureFromSurface error.");
+	SHH::Log::Error("Window::Resources::LoadFont(): SDL_CreateTextureFromSurface error.");
 	SDL_FreeSurface(textSurface);
 	TTF_CloseFont(font);
 	return false;

@@ -15,42 +15,42 @@ static CircularContainer<message_sim> inqueueSim (INQUEUE_SIM_MAXSIZE);
 
 bool SHH::MessageHandler::Init()
 {
-    SHH::Log::Log("SHH::MessageHandler::Init(): Started.");
+    SHH::Log::Log("MessageHandler::Init(): Started.");
 
     if (!inqueueCtrl.IsValid())
     {
-	SHH::Log::Error("SHH::MessageHandler::Init(): Could not allocate memory for inqueueCtrl.");
+	SHH::Log::Error("MessageHandler::Init(): Could not allocate memory for inqueueCtrl.");
 	return false;
     }
 
     if (!inqueueSim.IsValid())
     {
-	SHH::Log::Error("SHH::MessageHandler::Init(): Could not allocate memory for inqueueSim.");
+	SHH::Log::Error("MessageHandler::Init(): Could not allocate memory for inqueueSim.");
 	inqueueCtrl.Deinit();
 	return false;
     }
 
     if (!outqueueCtrl.IsValid())
     {
-	SHH::Log::Error("SHH::MessageHandler::Init(): Could not allocate memory for outqueueCtrl.");
+	SHH::Log::Error("MessageHandler::Init(): Could not allocate memory for outqueueCtrl.");
 	inqueueSim.Deinit();
 	inqueueCtrl.Deinit();
 	return false;
     }
 
-    SHH::Log::Log("SHH::MessageHandler::Init(): Ended successfully.");
+    SHH::Log::Log("MessageHandler::Init(): Ended successfully.");
     return true;
 }
 
 void SHH::MessageHandler::Deinit()
 {
-    SHH::Log::Log("SHH::MessageHandler::Deinit(): Started.");
+    SHH::Log::Log("MessageHandler::Deinit(): Started.");
 
     inqueueCtrl.Deinit();
     inqueueSim.Deinit();
     outqueueCtrl.Deinit();
 
-    SHH::Log::Log("SHH::MessageHandler::Deinit(): Ended successfully.");
+    SHH::Log::Log("MessageHandler::Deinit(): Ended successfully.");
 }
 
 void SHH::MessageHandler::SetMessagingMode(messaging_mode mmode)
@@ -67,13 +67,13 @@ bool SHH::MessageHandler::PushControlMessage(message_ctrl const& msg)
 {
     if (messagingMode == MM_CLIENT && !outqueueCtrl.Push(msg))
     {
-	SHH::Log::Warning("SHH::MessageHandler::PushControlMessage(): Outqueue is filled.");
+	SHH::Log::Warning("MessageHandler::PushControlMessage(): Outqueue is filled.");
 	return false;
     }
 
     if (!inqueueCtrl.Push(msg))
     {
-	SHH::Log::Warning("SHH::MessageHandler::PushControlMessage(): Inqueue is filled.");
+	SHH::Log::Warning("MessageHandler::PushControlMessage(): Inqueue is filled.");
 	return false;
     }
 
@@ -84,7 +84,7 @@ bool SHH::MessageHandler::PushSimulationMessage(message_sim const& msg)
 {
     if (!inqueueSim.Push(msg))
     {
-	SHH::Log::Warning("SHH::MessageHandler::PushSimulationMessage(): Queue is filled.");
+	SHH::Log::Warning("MessageHandler::PushSimulationMessage(): Queue is filled.");
 	return false;
     }
 

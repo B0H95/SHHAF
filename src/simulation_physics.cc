@@ -12,15 +12,15 @@ static void handleEnvironmentCollisions(object& obj, environment* elist, int eli
 
 bool SHH::Simulation::Physics::Init()
 {
-    SHH::Log::Log("SHH::Simulation::Physics::Init(): Started.");
-    SHH::Log::Log("SHH::Simulation::Physics::Init(): Ended successfully.");
+    SHH::Log::Log("Simulation::Physics::Init(): Started.");
+    SHH::Log::Log("Simulation::Physics::Init(): Ended successfully.");
     return true;
 }
 
 void SHH::Simulation::Physics::Deinit()
 {
-    SHH::Log::Log("SHH::Simulation::Physics::Deinit(): Started.");
-    SHH::Log::Log("SHH::Simulation::Physics::Deinit(): Ended successfully.");
+    SHH::Log::Log("Simulation::Physics::Deinit(): Started.");
+    SHH::Log::Log("Simulation::Physics::Deinit(): Ended successfully.");
 }
 
 void SHH::Simulation::Physics::ApplyPhysics(object* olist, object* obrlist, int olistsize, environment* elist, int elistsize)

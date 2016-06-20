@@ -14,7 +14,7 @@ static int controlEventListSize = 0;
 
 bool SHH::Simulation::Behavior::Init()
 {
-    SHH::Log::Log("SHH::Simulation::Behavior::Init(): Started.");
+    SHH::Log::Log("Simulation::Behavior::Init(): Started.");
 
     behaviorList[OT_NONE].OnUpdate = nullptr;
     behaviorList[OT_NONE].OnMessage = nullptr;
@@ -28,7 +28,7 @@ bool SHH::Simulation::Behavior::Init()
     controlEventList = new message_ctrl [CONTROL_EVENT_LIST_MAXSIZE];
     if (controlEventList == nullptr)
     {
-	SHH::Log::Error("SHH::Simulation::Behavior::Init(): Could not allocate memory for controlEventList.");
+	SHH::Log::Error("Simulation::Behavior::Init(): Could not allocate memory for controlEventList.");
 	return false;
     }
 
@@ -37,13 +37,13 @@ bool SHH::Simulation::Behavior::Init()
 	SHH::Units::CreateNoneControlMessage(controlEventList[i]);
     }
 
-    SHH::Log::Log("SHH::Simulation::Behavior::Init(): Ended successfully.");
+    SHH::Log::Log("Simulation::Behavior::Init(): Ended successfully.");
     return true;
 }
 
 void SHH::Simulation::Behavior::Deinit()
 {
-    SHH::Log::Log("SHH::Simulation::Behavior::Deinit(): Started.");
+    SHH::Log::Log("Simulation::Behavior::Deinit(): Started.");
 
     if (controlEventList != nullptr)
     {
@@ -51,14 +51,14 @@ void SHH::Simulation::Behavior::Deinit()
 	controlEventList = nullptr;
     }
 
-    SHH::Log::Log("SHH::Simulation::Behavior::Deinit(): Ended successfully.");
+    SHH::Log::Log("Simulation::Behavior::Deinit(): Ended successfully.");
 }
 
 bool SHH::Simulation::Behavior::PushControlMessage(message_ctrl const& msg)
 {
     if (controlEventListSize >= CONTROL_EVENT_LIST_MAXSIZE)
     {
-	SHH::Log::Warning("SHH::Simulation::Behavior::PushControlMessage(): Not enough space in controlEventList.");
+	SHH::Log::Warning("Simulation::Behavior::PushControlMessage(): Not enough space in controlEventList.");
 	return false;
     }
     

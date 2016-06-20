@@ -23,18 +23,18 @@ static SDL_Keycode currentKey = 0;
 
 bool SHH::Window::Init(int width, int height, std::string name)
 {
-    SHH::Log::Log("SHH::Window::Init(): Start.");
+    SHH::Log::Log("Window::Init(): Start.");
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
-	SHH::Log::Error("SHH::Window::Init(): SDL_Init failed.");
+	SHH::Log::Error("Window::Init(): SDL_Init failed.");
 	return false;
     }
 
     window = SDL_CreateWindow(name.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN);
     if (window == nullptr)
     {
-	SHH::Log::Error("SHH::Window::Init(): SDL_CreateWindow failed.");
+	SHH::Log::Error("Window::Init(): SDL_CreateWindow failed.");
 	SDL_Quit();
 	return false;
     }
@@ -42,7 +42,7 @@ bool SHH::Window::Init(int width, int height, std::string name)
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if (renderer == nullptr)
     {
-	SHH::Log::Error("SHH::Window::Init(): SDL_CreateRenderer failed.");
+	SHH::Log::Error("Window::Init(): SDL_CreateRenderer failed.");
 	SDL_DestroyWindow(window);
 	SDL_Quit();
 	return false;
@@ -50,7 +50,7 @@ bool SHH::Window::Init(int width, int height, std::string name)
 
     if (!SHH::Window::Resources::Init(renderer))
     {
-	SHH::Log::Error("SHH::Window::Init(): Could not init resources.");
+	SHH::Log::Error("Window::Init(): Could not init resources.");
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
@@ -66,13 +66,13 @@ bool SHH::Window::Init(int width, int height, std::string name)
 	previousKeystates[i] = 0;
     }
 
-    SHH::Log::Log("SHH::Window::Init(): Ended successfully.");
+    SHH::Log::Log("Window::Init(): Ended successfully.");
     return true;
 }
 
 void SHH::Window::Deinit()
 {
-    SHH::Log::Log("SHH::Window::Deinit(): Start.");
+    SHH::Log::Log("Window::Deinit(): Start.");
 
     if (renderer != nullptr)
     {
@@ -88,7 +88,7 @@ void SHH::Window::Deinit()
 
     SDL_Quit();
 
-    SHH::Log::Log("SHH::Window::Deinit(): Ended successfully.");
+    SHH::Log::Log("Window::Deinit(): Ended successfully.");
 }
 
 void SHH::Window::ProcessEvents()
@@ -153,7 +153,7 @@ bool SHH::Window::LoadFont(std::string name, int size)
 {
     if (!SHH::Window::Resources::LoadFont(name, size))
     {
-	SHH::Log::Error("SHH::Window::LoadFont(): Could not load font.");
+	SHH::Log::Error("Window::LoadFont(): Could not load font.");
 	return false;
     }
     return true;

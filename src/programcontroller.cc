@@ -22,27 +22,27 @@ static std::chrono::high_resolution_clock::time_point endTime;
 
 bool SHH::ProgramController::Init(int argc, char* argv[])
 {
-    SHH::Log::Log("SHH::ProgramController::Init(): Start.");
+    SHH::Log::Log("ProgramController::Init(): Start.");
     
     argumentCount = argc;
     arguments = argv;
 
     if (!SHH::Window::Init(800, 600, "Super Heroin Hobo Arena Fighter!"))
     {
-	SHH::Log::Error("SHH::ProgramController::Init(): Could not init window.");
+	SHH::Log::Error("ProgramController::Init(): Could not init window.");
 	return false;
     }
 
     if (!SHH::UI::Init())
     {
-	SHH::Log::Error("SHH::ProgramController::Init(): Could not init UI.");
+	SHH::Log::Error("ProgramController::Init(): Could not init UI.");
 	SHH::Window::Deinit();
 	return false;
     }
 
     if (!SHH::Simulation::Init())
     {
-	SHH::Log::Error("SHH::ProgramController::Init(): Could not init simulation.");
+	SHH::Log::Error("ProgramController::Init(): Could not init simulation.");
 	SHH::UI::Deinit();
 	SHH::Window::Deinit();
 	return false;
@@ -50,7 +50,7 @@ bool SHH::ProgramController::Init(int argc, char* argv[])
 
     if (!SHH::MessageHandler::Init())
     {
-	SHH::Log::Error("SHH::ProgramController::Init(): Could not init message handler.");
+	SHH::Log::Error("ProgramController::Init(): Could not init message handler.");
 	SHH::Simulation::Deinit();
 	SHH::UI::Deinit();
 	SHH::Window::Deinit();
@@ -59,7 +59,7 @@ bool SHH::ProgramController::Init(int argc, char* argv[])
 
     if (!SHH::NetworkController::Init())
     {
-	SHH::Log::Error("SHH::ProgramController::Init(): Could not init network controller.");
+	SHH::Log::Error("ProgramController::Init(): Could not init network controller.");
 	SHH::MessageHandler::Deinit();
 	SHH::Simulation::Deinit();
 	SHH::UI::Deinit();
@@ -67,30 +67,30 @@ bool SHH::ProgramController::Init(int argc, char* argv[])
 	return false;
     }
 
-    SHH::Log::Log("SHH::ProgramController::Init(): Ended successfully.");
+    SHH::Log::Log("ProgramController::Init(): Ended successfully.");
     return true;
 }
 
 bool SHH::ProgramController::Postinit()
 {
-    SHH::Log::Log("SHH::ProgramController::Postinit(): Start.");
+    SHH::Log::Log("ProgramController::Postinit(): Start.");
 
     SHH::Simulation::SetMessagingMode(MM_OFFLINE);
     SHH::MessageHandler::SetMessagingMode(MM_OFFLINE);
 
     if (!SHH::Simulation::Postinit())
     {
-	SHH::Log::Error("SHH::ProgramController::Postinit(): Could not postinit simulation.");
+	SHH::Log::Error("ProgramController::Postinit(): Could not postinit simulation.");
 	return false;
     }
 
-    SHH::Log::Log("SHH::ProgramController::Postinit(): Ended successfully.");
+    SHH::Log::Log("ProgramController::Postinit(): Ended successfully.");
     return true;
 }
 
 void SHH::ProgramController::Deinit()
 {
-    SHH::Log::Log("SHH::ProgramController::Deinit(): Start.");
+    SHH::Log::Log("ProgramController::Deinit(): Start.");
 
     SHH::NetworkController::Deinit();
     SHH::MessageHandler::Deinit();
@@ -98,16 +98,16 @@ void SHH::ProgramController::Deinit()
     SHH::UI::Deinit();
     SHH::Window::Deinit();
 
-    SHH::Log::Log("SHH::ProgramController::Deinit(): Ended successfully.");
+    SHH::Log::Log("ProgramController::Deinit(): Ended successfully.");
 }
 
 void SHH::ProgramController::Run()
 {
-    SHH::Log::Log("SHH::ProgramController::Run(): Start.");
+    SHH::Log::Log("ProgramController::Run(): Start.");
 
     if (!SHH::NetworkController::Run())
     {
-	SHH::Log::Warning("SHH::ProgramController::Run(): Could not run network controller.");
+	SHH::Log::Warning("ProgramController::Run(): Could not run network controller.");
     }
 
     while (running)
@@ -131,12 +131,12 @@ void SHH::ProgramController::Run()
 
     SHH::NetworkController::Stop();
 
-    SHH::Log::Log("SHH::ProgramController::Run(): Ended successfully.");
+    SHH::Log::Log("ProgramController::Run(): Ended successfully.");
 }
 
 void SHH::ProgramController::Quit()
 {
-    SHH::Log::Log("SHH::ProgramController::Quit(): Quit called.");
+    SHH::Log::Log("ProgramController::Quit(): Quit called.");
     running = false;
 }
 

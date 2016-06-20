@@ -12,27 +12,27 @@ static void networkThreadMain();
 
 bool SHH::NetworkController::Init()
 {
-    SHH::Log::Log("SHH::NetworkController::Init(): Started.");
+    SHH::Log::Log("NetworkController::Init(): Started.");
     
     if (!SHH::UDP::Init(512))
     {
-	SHH::Log::Error("SHH::NetworkController::Init(): Could not init UDP.");
+	SHH::Log::Error("NetworkController::Init(): Could not init UDP.");
 	return false;
     }
 
-    SHH::Log::Log("SHH::NetworkController::Init(): Ended successfully.");
+    SHH::Log::Log("NetworkController::Init(): Ended successfully.");
     return true;
 }
 
 void SHH::NetworkController::Deinit()
 {
-    SHH::Log::Log("SHH::NetworkController::Deinit(): Started.");
+    SHH::Log::Log("NetworkController::Deinit(): Started.");
     
     running = false;
 
     if (netthread != nullptr)
     {
-	SHH::Log::Log("SHH::NetworkController::Deinit(): Waiting for netthread to finish.");
+	SHH::Log::Log("NetworkController::Deinit(): Waiting for netthread to finish.");
 	netthread->join();
 	delete netthread;
 	netthread = nullptr;
@@ -40,34 +40,34 @@ void SHH::NetworkController::Deinit()
 
     SHH::UDP::Deinit();
 
-    SHH::Log::Log("SHH::NetworkController::Deinit(): Ended successfully.");
+    SHH::Log::Log("NetworkController::Deinit(): Ended successfully.");
 }
 
 bool SHH::NetworkController::Run()
 {
-    SHH::Log::Log("SHH::NetworkController::Run(): Started.");
+    SHH::Log::Log("NetworkController::Run(): Started.");
 
     running = true;
     netthread = new std::thread (networkThreadMain);
     if (netthread == nullptr)
     {
-	SHH::Log::Error("SHH::NetworkController::Init(): Could not create network thread.");
+	SHH::Log::Error("NetworkController::Init(): Could not create network thread.");
 	return false;
     }
 
-    SHH::Log::Log("SHH::NetworkController::Run(): Ended successfully.");
+    SHH::Log::Log("NetworkController::Run(): Ended successfully.");
     return true;
 }
 
 void SHH::NetworkController::Stop()
 {
-    SHH::Log::Log("SHH::NetworkController::Stop(): Stop called.");
+    SHH::Log::Log("NetworkController::Stop(): Stop called.");
 
     running = false;
 
     if (netthread != nullptr)
     {
-	SHH::Log::Log("SHH::NetworkController::Stop(): Waiting for netthread to finish.");
+	SHH::Log::Log("NetworkController::Stop(): Waiting for netthread to finish.");
 	netthread->join();
 	delete netthread;
 	netthread = nullptr;

@@ -28,19 +28,19 @@ static void sendObjectUpdates();
 
 bool SHH::Simulation::Init()
 {
-    SHH::Log::Log("SHH::Simulation::Init(): Started.");
+    SHH::Log::Log("Simulation::Init(): Started.");
 
     objectList = new object [OBJECT_LIST_SIZE];
     if (objectList == nullptr)
     {
-	SHH::Log::Error("SHH::Simulation::Init(): Could not allocate memory for objectList.");
+	SHH::Log::Error("Simulation::Init(): Could not allocate memory for objectList.");
 	return false;
     }
 
     environmentList = new environment [ENVIRONMENT_LIST_SIZE];
     if (environmentList == nullptr)
     {
-	SHH::Log::Error("SHH::Simulation::Init(): Could not allocate memory for environmentList.");
+	SHH::Log::Error("Simulation::Init(): Could not allocate memory for environmentList.");
 	delete[] objectList;
 	objectList = nullptr;
 	return false;
@@ -48,7 +48,7 @@ bool SHH::Simulation::Init()
 
     if (!SHH::Simulation::Behavior::Init())
     {
-	SHH::Log::Error("SHH::Simulation::Init(): Could not init behaviors.");
+	SHH::Log::Error("Simulation::Init(): Could not init behaviors.");
 	delete[] environmentList;
 	environmentList = nullptr;
 	delete[] objectList;
@@ -58,7 +58,7 @@ bool SHH::Simulation::Init()
 
     if (!SHH::Simulation::Physics::Init())
     {
-	SHH::Log::Error("SHH::Simulation::Init(): Could not init physics.");
+	SHH::Log::Error("Simulation::Init(): Could not init physics.");
 	SHH::Simulation::Behavior::Deinit();
 	delete[] environmentList;
 	environmentList = nullptr;
@@ -70,7 +70,7 @@ bool SHH::Simulation::Init()
     objectBehaviorRequests = new object [OBJECT_LIST_SIZE];
     if (objectBehaviorRequests == nullptr)
     {
-	SHH::Log::Error("SHH::Simulation::Init(): Could not allocate memory for objectBehaviorRequests.");
+	SHH::Log::Error("Simulation::Init(): Could not allocate memory for objectBehaviorRequests.");
 	SHH::Simulation::Physics::Deinit();
 	SHH::Simulation::Behavior::Deinit();
 	delete[] environmentList;
@@ -90,7 +90,7 @@ bool SHH::Simulation::Init()
 	SHH::Units::CreateNoneEnvironment(environmentList[i]);
     }
 
-    SHH::Log::Log("SHH::Simulation::Init(): Ended successfully.");
+    SHH::Log::Log("Simulation::Init(): Ended successfully.");
     return true;
 }
 
@@ -102,7 +102,7 @@ bool SHH::Simulation::Postinit()
 
 void SHH::Simulation::Deinit()
 {
-    SHH::Log::Log("SHH::Simulation::Deinit(): Started.");
+    SHH::Log::Log("Simulation::Deinit(): Started.");
 
     if (objectList != nullptr)
     {
@@ -125,7 +125,7 @@ void SHH::Simulation::Deinit()
     SHH::Simulation::Physics::Deinit();
     SHH::Simulation::Behavior::Deinit();
 
-    SHH::Log::Log("SHH::Simulation::Deinit(): Ended successfully.");
+    SHH::Log::Log("Simulation::Deinit(): Ended successfully.");
 }
 
 void SHH::Simulation::Update()
@@ -167,19 +167,19 @@ bool SHH::Simulation::InsertObject(object const& obj)
 {
     if (objectList == nullptr)
     {
-	SHH::Log::Warning("SHH::Simulation::InsertObject(): No memory allocated for objectList.");
+	SHH::Log::Warning("Simulation::InsertObject(): No memory allocated for objectList.");
 	return false;
     }
 
     if (objectListSize >= OBJECT_LIST_SIZE)
     {
-	SHH::Log::Warning("SHH::Simulation::InsertObject(): No space left in objectList.");
+	SHH::Log::Warning("Simulation::InsertObject(): No space left in objectList.");
 	return false;
     }
 
     if (messagingMode == MM_CLIENT)
     {
-	SHH::Log::Warning("SHH::Simulation::InsertObject(): Can not add objects in client mode.");
+	SHH::Log::Warning("Simulation::InsertObject(): Can not add objects in client mode.");
 	return false;	
     }
 
@@ -193,7 +193,7 @@ bool SHH::Simulation::InsertEnvironment(environment const& env)
 {
     if (environmentList == nullptr)
     {
-	SHH::Log::Warning("SHH::Simulation::InsertEnvironment(): No memory allocated for environmentList.");
+	SHH::Log::Warning("Simulation::InsertEnvironment(): No memory allocated for environmentList.");
 	return false;
     }
 
@@ -205,7 +205,7 @@ bool SHH::Simulation::InsertEnvironment(environment const& env)
 
     if (freeIndex == ENVIRONMENT_LIST_SIZE)
     {
-	SHH::Log::Warning("SHH::Simulation::InsertEnvironment(): No space left in environmentList.");
+	SHH::Log::Warning("Simulation::InsertEnvironment(): No space left in environmentList.");
 	return false;
     }
 
@@ -216,7 +216,7 @@ bool SHH::Simulation::InsertEnvironment(environment const& env)
 
 bool SHH::Simulation::LoadMap(std::string mapname)
 {
-    SHH::Log::Warning("SHH::Simulation::LoadMap(\"" + mapname + "\"): To be implemented, loading default instead.");
+    SHH::Log::Warning("Simulation::LoadMap(\"" + mapname + "\"): To be implemented, loading default instead.");
     SHH::Simulation::InsertEnvironment(SHH::Units::CreateSolidEnvironment(50.0f,500.0f,700.0f,50.0f));
     SHH::Simulation::InsertEnvironment(SHH::Units::CreateSolidEnvironment(50.0f,450.0f,150.0f,50.0f));
     SHH::Simulation::InsertEnvironment(SHH::Units::CreateSolidEnvironment(400.0f,490.0f,300.0f,10.0f));
@@ -279,13 +279,13 @@ static bool insertUnsynchedObject(object const& obj)
 {
     if (objectList == nullptr)
     {
-	SHH::Log::Warning("SHH::Simulation insertUnsynchedObject(): No memory allocated for objectList.");
+	SHH::Log::Warning("Simulation insertUnsynchedObject(): No memory allocated for objectList.");
 	return false;
     }
 
     if (objectListSize >= OBJECT_LIST_SIZE)
     {
-	SHH::Log::Warning("SHH::Simulation insertUnsynchedObject(): No space left in objectList.");
+	SHH::Log::Warning("Simulation insertUnsynchedObject(): No space left in objectList.");
 	return false;
     }
 

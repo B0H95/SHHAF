@@ -14,22 +14,22 @@ static void drawConsole();
 
 bool SHH::UI::Init()
 {
-    SHH::Log::Log("SHH::UI::Init(): Started.");
+    SHH::Log::Log("UI::Init(): Started.");
 
     if (!SHH::Window::LoadFont("res/fonts/default.ttf", 24))
     {
-	SHH::Log::Error("SHH::UI::Init(): Could not load default font.");
+	SHH::Log::Error("UI::Init(): Could not load default font.");
 	return false;
     }
 
-    SHH::Log::Log("SHH::UI::Init(): Ended successfully.");
+    SHH::Log::Log("UI::Init(): Ended successfully.");
     return true;
 }
 
 void SHH::UI::Deinit()
 {
-    SHH::Log::Log("SHH::UI::Deinit(): Started.");
-    SHH::Log::Log("SHH::UI::Deinit(): Ended successfully.");
+    SHH::Log::Log("UI::Deinit(): Started.");
+    SHH::Log::Log("UI::Deinit(): Ended successfully.");
 }
 
 void SHH::UI::Draw()

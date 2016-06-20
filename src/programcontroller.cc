@@ -22,10 +22,9 @@ static std::chrono::high_resolution_clock::time_point endTime;
 
 bool SHH::ProgramController::Init(int argc, char* argv[])
 {
-    SHH::Log::Log("ProgramController::Init(): Start.");
-    
     argumentCount = argc;
     arguments = argv;
+    SHH::Log::Log("ProgramController::Init(): Start.");
 
     if (!SHH::Window::Init(800, 600, "Super Heroin Hobo Arena Fighter!"))
     {

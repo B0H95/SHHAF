@@ -1,5 +1,7 @@
 #pragma once
 
+#include "window_resources_font.hh"
+
 #include <SDL2/SDL.h>
 #include <string>
 
@@ -12,9 +14,7 @@ namespace SHH
 	    bool Init(SDL_Renderer* currentrenderer);
 	    void Deinit();
 	    bool LoadFont(std::string name, int height);
-	    SDL_Texture* GetFontCharMap();
-	    int GetFontWidth();
-	    int GetFontHeight();
+	    SHH::Window::Resources::Font* GetCurrentFont();
 	}
     }
 }

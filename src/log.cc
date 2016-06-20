@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <string>
+#include "programcontroller.hh"
 
 static const int LOGSIZE = 100;
 static std::string* log = nullptr;
@@ -34,6 +35,10 @@ void SHH::Log::Deinit()
 void SHH::Log::Log(std::string str)
 {
     LogWrite(str);
+    if (SHH::ProgramController::GetParameter("-log"))
+    {
+	std::cout << str << std::endl;
+    }
 }
 
 void SHH::Log::Warning(std::string str)

@@ -1,6 +1,7 @@
 #include "window.hh"
 
 #include "window_resources.hh"
+#include "window_resources_font.hh"
 
 #include <SDL2/SDL.h>
 #include "programcontroller.hh"
@@ -203,11 +204,13 @@ void SHH::Window::DrawText(std::string text, int x, int y)
     {
 	return;
     }
-    
-    int charWidth = SHH::Window::Resources::GetFontWidth();
-    SDL_Texture* charmap = SHH::Window::Resources::GetFontCharMap();
+
+    SHH::Window::Resources::Font* font = SHH::Window::Resources::GetCurrentFont();
+    int charWidth = font->GetCharWidth();
+    SDL_Texture* charmap = font->GetCharMap();
     SDL_Rect rect = {0, y, fontCharDrawWidth, fontCharDrawHeight};
-    SDL_Rect charmappos = {0, 0, charWidth, SHH::Window::Resources::GetFontHeight()};
+    SDL_Rect charmappos = {0, 0, charWidth, font->GetCharHeight()};
+
     for (int i = 0; i < (int)text.length(); ++i)
     {
 	rect.x = x + (charWidth * i);

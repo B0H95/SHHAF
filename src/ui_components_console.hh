@@ -19,6 +19,7 @@ namespace SHH
 	    private:
 		bool visible;
 		std::string input;
+		int scroll;
 	    };
 	}
     }

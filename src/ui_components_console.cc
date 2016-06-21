@@ -9,6 +9,7 @@ bool SHH::UI::Components::Console::Init()
 {
     visible = false;
     input = "";
+    scroll = 0;
     return true;
 }
 
@@ -44,6 +45,16 @@ void SHH::UI::Components::Console::ProcessInputs()
 		input = "";
 		return;
 	    }
+	    if (SHH::Window::IsKeyPressed("PageUp"))
+	    {
+		++scroll;
+		return;
+	    }
+	    if (SHH::Window::IsKeyPressed("PageDown") && scroll > 0)
+	    {
+		--scroll;
+		return;
+	    }
 	    std::string currentKey = SHH::Window::GetCurrentKey();
 	    if (currentKey.length() == 1)
 	    {
@@ -67,7 +78,7 @@ void SHH::UI::Components::Console::Draw()
 
     for (int i = 0; i < amountOfLines; ++i)
     {
-	SHH::Window::DrawText(SHH::Log::GetLogEntry(amountOfLines - i - 1), 0, i * fontHeight);
+	SHH::Window::DrawText(SHH::Log::GetLogEntry(amountOfLines - i - 1 + scroll), 0, i * fontHeight);
     }
 
     std::string inputLine = "> " + input + " <";

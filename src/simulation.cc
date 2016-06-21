@@ -6,6 +6,7 @@
 #include "log.hh"
 #include "programcontroller.hh"
 #include "messagehandler.hh"
+#include "heapmanager.hh"
 
 static int newObjectIndex = 1;
 static messaging_mode messagingMode = MM_OFFLINE;
@@ -30,18 +31,18 @@ bool SHH::Simulation::Init()
 {
     SHH::Log::Log("Simulation::Init(): Started.");
 
-    objectList = new object [OBJECT_LIST_SIZE];
+    objectList = (object*)SHH::HeapManager::Allocate(sizeof(object) * OBJECT_LIST_SIZE);
     if (objectList == nullptr)
     {
 	SHH::Log::Error("Simulation::Init(): Could not allocate memory for objectList.");
 	return false;
     }
 
-    environmentList = new environment [ENVIRONMENT_LIST_SIZE];
+    environmentList = (environment*)SHH::HeapManager::Allocate(sizeof(environment) * ENVIRONMENT_LIST_SIZE);
     if (environmentList == nullptr)
     {
 	SHH::Log::Error("Simulation::Init(): Could not allocate memory for environmentList.");
-	delete[] objectList;
+	SHH::HeapManager::Deallocate(objectList);
 	objectList = nullptr;
 	return false;
     }
@@ -49,9 +50,9 @@ bool SHH::Simulation::Init()
     if (!SHH::Simulation::Behavior::Init())
     {
 	SHH::Log::Error("Simulation::Init(): Could not init behaviors.");
-	delete[] environmentList;
+	SHH::HeapManager::Deallocate(environmentList);
 	environmentList = nullptr;
-	delete[] objectList;
+	SHH::HeapManager::Deallocate(objectList);
 	objectList = nullptr;
 	return false;
     }
@@ -60,22 +61,22 @@ bool SHH::Simulation::Init()
     {
 	SHH::Log::Error("Simulation::Init(): Could not init physics.");
 	SHH::Simulation::Behavior::Deinit();
-	delete[] environmentList;
+	SHH::HeapManager::Deallocate(environmentList);
 	environmentList = nullptr;
-	delete[] objectList;
+	SHH::HeapManager::Deallocate(objectList);
 	objectList = nullptr;
 	return false;
     }
 
-    objectBehaviorRequests = new object [OBJECT_LIST_SIZE];
+    objectBehaviorRequests = (object*)SHH::HeapManager::Allocate(sizeof(object) * OBJECT_LIST_SIZE);
     if (objectBehaviorRequests == nullptr)
     {
 	SHH::Log::Error("Simulation::Init(): Could not allocate memory for objectBehaviorRequests.");
 	SHH::Simulation::Physics::Deinit();
 	SHH::Simulation::Behavior::Deinit();
-	delete[] environmentList;
+	SHH::HeapManager::Deallocate(environmentList);
 	environmentList = nullptr;
-	delete[] objectList;
+	SHH::HeapManager::Deallocate(objectList);
 	objectList = nullptr;
 	return false;
     }
@@ -106,19 +107,19 @@ void SHH::Simulation::Deinit()
 
     if (objectList != nullptr)
     {
-	delete[] objectList;
+	SHH::HeapManager::Deallocate(objectList);
 	objectList = nullptr;
     }
 
     if (objectBehaviorRequests != nullptr)
     {
-	delete[] objectBehaviorRequests;
+	SHH::HeapManager::Deallocate(objectBehaviorRequests);
 	objectBehaviorRequests = nullptr;
     }
 
     if (environmentList != nullptr)
     {
-	delete[] environmentList;
+	SHH::HeapManager::Deallocate(environmentList);
 	environmentList = nullptr;
     }
 

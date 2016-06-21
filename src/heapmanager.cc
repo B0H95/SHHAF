@@ -1,37 +1,32 @@
 #include "heapmanager.hh"
 
-#include <iostream>
+#include <string>
+#include "log.hh"
 
 static const unsigned int ALLOCS_MAX = 1000;
-static const unsigned int LISTALLOCS_MAX = 1000;
 
 static bool inited = false;
 static unsigned int allocCounter = 0;
 static void** allocs = nullptr;
-static void** listallocs = nullptr;
 static unsigned int allocsEnd = 0;
-static unsigned int listallocsEnd = 0;
 
-static void deinitList(void** pointerlist, unsigned int maxvalue);
-static void findAndNull(void** pointerlist, unsigned int maxvalue, unsigned int endindex, void* toremove);
+static void deinitAllocs();
+static void findAndNull(void* toremove);
 
 bool SHH::HeapManager::Init()
 {
     allocs = new void* [ALLOCS_MAX];
     if (allocs == nullptr)
     {
-	std::cout << "ERROR: HeapManager::Init(): Could not allocate memory for allocs." << std::endl;
-	return false;
-    }
-
-    listallocs = new void* [LISTALLOCS_MAX];
-    if (listallocs == nullptr)
-    {
-	std::cout << "ERROR: HeapManager::Init(): Could not allocate memory for allocs." << std::endl;
-	delete[] allocs;
+	SHH::Log::Error("HeapManager::Init(): Could not allocate memory for list.");
 	return false;
     }
     
+    for (unsigned int i = 0; i < ALLOCS_MAX; ++i)
+    {
+	allocs[i] = nullptr;
+    }
+
     inited = true;
     return true;
 }
@@ -40,14 +35,13 @@ void SHH::HeapManager::Deinit()
 {
     if (allocCounter > 0)
     {
-	std::cout << "WARNING: HeapManager::Deinit(): " << allocCounter << " allocations left unfreed." << std::endl;
+	SHH::Log::Warning("HeapManager::Deinit(): " + std::to_string(allocCounter) + " allocations left unfreed.");
     }
     if (inited)
     {
-	deinitList(allocs, ALLOCS_MAX);
-	deinitList(listallocs, LISTALLOCS_MAX);
+	deinitAllocs();
 	delete[] allocs;
-	delete[] listallocs;
+	allocs = nullptr;
 	allocCounter = 0;
 	inited = false;
     }
@@ -55,53 +49,34 @@ void SHH::HeapManager::Deinit()
 
 void* SHH::HeapManager::Allocate(std::size_t count)
 {
-    if (allocsEnd >= ALLOCS_MAX || allocs == nullptr)
+    void* results = malloc(count);
+    if (results == nullptr)
     {
 	return nullptr;
     }
-    void* results = malloc(count);
-    if (results != nullptr)
+    if (allocs != nullptr)
     {
+	if (allocsEnd >= ALLOCS_MAX)
+	{
+	    SHH::Log::Warning("HeapManager::Allocate(): No room to keep track of allocation.");
+	    return results;
+	}
 	++allocCounter;
 	allocs[allocsEnd++] = results;
     }
     return results;
 }
 
-void* SHH::HeapManager::AllocateList(std::size_t count)
-{
-    if (listallocsEnd >= ALLOCS_MAX || listallocs == nullptr)
-    {
-	return nullptr;
-    }
-    void* results = malloc(count);
-    if (results != nullptr)
-    {
-	++allocCounter;
-	listallocs[listallocsEnd++] = results;
-    }
-    return results;
-}
-
 void SHH::HeapManager::Deallocate(void* ptr)
 {
-    if (allocs != nullptr && ptr != nullptr)
+    if (ptr == nullptr)
     {
-	free(ptr);
-	--allocCounter;
-	--allocsEnd;
-	findAndNull(allocs, ALLOCS_MAX, allocsEnd, ptr);
+	return;
     }
-}
-
-void SHH::HeapManager::DeallocateList(void* ptr)
-{
-    if (listallocs != nullptr && ptr != nullptr)
+    free(ptr);
+    if (allocs != nullptr)
     {
-	free(ptr);
-	--allocCounter;
-	--listallocsEnd;
-	findAndNull(listallocs, LISTALLOCS_MAX, listallocsEnd, ptr);
+	findAndNull(ptr);
     }
 }
 
@@ -110,34 +85,40 @@ unsigned int SHH::HeapManager::GetAllocationCount()
     return allocCounter;
 }
 
-static void deinitList(void** pointerlist, unsigned int maxvalue)
+static void deinitAllocs()
 {
-    if (pointerlist == nullptr)
+    if (allocs == nullptr)
     {
 	return;
     }
-    for (unsigned int i = 0; i < maxvalue; ++i)
+    for (unsigned int i = 0; i < ALLOCS_MAX; ++i)
     {
-	if (pointerlist[i] == nullptr)
+	if (allocs[i] == nullptr)
 	{
 	    break;
 	}
-	free(pointerlist[i]);
+	free(allocs[i]);
     }
 }
 
-static void findAndNull(void** pointerlist, unsigned int maxvalue, unsigned int endindex, void* toremove)
+static void findAndNull(void* toremove)
 {
-    for (unsigned int i = 0; i < maxvalue; ++i)
+    if (allocs == nullptr)
     {
-	if (pointerlist[i] == nullptr)
+	return;
+    }
+    for (unsigned int i = 0; i < ALLOCS_MAX; ++i)
+    {
+	if (allocs[i] == nullptr)
 	{
 	    return;
 	}
-	else if (pointerlist[i] == toremove)
+	else if (allocs[i] == toremove)
 	{
-	    pointerlist[i] = pointerlist[endindex];
-	    pointerlist[endindex] = nullptr;
+	    --allocCounter;
+	    --allocsEnd;
+	    allocs[i] = allocs[allocsEnd];
+	    allocs[allocsEnd] = nullptr;
 	}
     }
 }

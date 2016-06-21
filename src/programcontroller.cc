@@ -16,6 +16,7 @@ static char** arguments = nullptr;
 static float frameLoad = 0.0f;
 static float frameTime = 0.0f;
 static float frameRate = 60.0;
+static int frameRateInt = 60;
 static float frameRateTime = 1.0f / 60.0f;
 static std::chrono::high_resolution_clock::time_point startTime;
 static std::chrono::high_resolution_clock::time_point endTime;
@@ -150,6 +151,11 @@ float SHH::ProgramController::GetFrameTime()
     return frameTime;
 }
 
+int SHH::ProgramController::GetFrameRate()
+{
+    return frameRateInt;
+}
+
 float SHH::ProgramController::GetFrameLoad()
 {
     return frameLoad;
@@ -173,6 +179,7 @@ bool SHH::ProgramController::GetParameter(const char* param)
 
 void SHH::ProgramController::SetFramerate(int rate)
 {
+    frameRateInt = rate;
     frameRate = (float)rate;
     frameRateTime = 1.0f / (float)rate;
 }

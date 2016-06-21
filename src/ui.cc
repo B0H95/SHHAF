@@ -1,6 +1,7 @@
 #include "ui.hh"
 
-#include <string>
+#include "ui_components_console.hh"
+
 #include "log.hh"
 #include "window.hh"
 #include "programcontroller.hh"
@@ -8,9 +9,10 @@
 #include "units.hh"
 #include "messagehandler.hh"
 
+static SHH::UI::Components::Console console;
+
 static void drawFrameLoadBar();
 static void drawSimulation();
-static void drawConsole();
 
 bool SHH::UI::Init()
 {
@@ -19,6 +21,12 @@ bool SHH::UI::Init()
     if (!SHH::Window::LoadFont("res/fonts/default.ttf", 24))
     {
 	SHH::Log::Error("UI::Init(): Could not load default font.");
+	return false;
+    }
+
+    if (!console.Init())
+    {
+	SHH::Log::Error("UI::Init(): Could not init console.");
 	return false;
     }
 
@@ -39,7 +47,8 @@ void SHH::UI::Draw()
 
     drawSimulation();
     drawFrameLoadBar();
-    drawConsole();
+    
+    console.Draw();
 
     SHH::Window::UpdateScreen();
 }
@@ -66,6 +75,13 @@ void SHH::UI::ProcessInputs()
 	msg.messagetype = MC_JUMP;
 	SHH::MessageHandler::PushControlMessage(msg);
     }
+
+    console.ProcessInputs();
+}
+
+void SHH::UI::SendMessage(std::string msg)
+{
+    SHH::Log::Log(msg);
 }
 
 static void drawFrameLoadBar()
@@ -113,19 +129,5 @@ static void drawSimulation()
 	    int y2 = int(environmentList[i].y + environmentList[i].height);
 	    SHH::Window::DrawFilledRectangle(x1, y1, x2, y2);
 	}
-    }
-}
-
-static void drawConsole()
-{
-    const int fontHeight = 16;
-    const int amountOfLines = SHH::Window::GetWindowHeight() / (fontHeight * 2);
-
-    SHH::Window::SetFontCharSize(8, fontHeight);
-    SHH::Window::SetColor(0xFF, 0xFF, 0xFF, 0xFF);
-
-    for (int i = 0; i < amountOfLines; ++i)
-    {
-	SHH::Window::DrawText(SHH::Log::GetLogEntry(amountOfLines - i - 1), 0, i * fontHeight);
     }
 }

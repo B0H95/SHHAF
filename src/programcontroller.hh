@@ -10,6 +10,7 @@ namespace SHH
 	void Run();
 	void Quit();
 	float GetFrameTime();
+	int GetFrameRate();
 	float GetFrameLoad();
 	bool GetParameter(const char* param);
 	void SetFramerate(int rate);

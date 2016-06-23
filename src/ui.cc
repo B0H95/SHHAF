@@ -58,7 +58,7 @@ void SHH::UI::ProcessInputs()
     message_ctrl msg;
     msg.sender = 0;
     msg.strsize = 0;
-    msg.str = nullptr;
+    msg.str = "";
 
     if (SHH::Window::IsKeyDown("left"))
     {

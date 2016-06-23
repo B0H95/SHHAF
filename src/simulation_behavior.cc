@@ -3,7 +3,6 @@
 #include "simulation_behavior_player.hh"
 
 #include "log.hh"
-#include "heapmanager.hh"
 
 static behavior behaviorList [OT_MAXVALUE];
 
@@ -26,7 +25,7 @@ bool SHH::Simulation::Behavior::Init()
     behaviorList[OT_PLAYER].OnUpdate = OT_PLAYER_OnUpdate;
     behaviorList[OT_PLAYER].OnMessage = OT_PLAYER_OnMessage;
 
-    controlEventList = (message_ctrl*)SHH::HeapManager::Allocate(sizeof(message_ctrl) * CONTROL_EVENT_LIST_MAXSIZE);
+    controlEventList = new message_ctrl [CONTROL_EVENT_LIST_MAXSIZE];
     if (controlEventList == nullptr)
     {
 	SHH::Log::Error("Simulation::Behavior::Init(): Could not allocate memory for controlEventList.");
@@ -48,7 +47,7 @@ void SHH::Simulation::Behavior::Deinit()
 
     if (controlEventList != nullptr)
     {
-	SHH::HeapManager::Deallocate(controlEventList);
+	delete[] controlEventList;
 	controlEventList = nullptr;
     }
 

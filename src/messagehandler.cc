@@ -97,7 +97,7 @@ message_ctrl SHH::MessageHandler::PopIncomingControlMessage()
     {
 	return inqueueCtrl.Pop();
     }
-    return {MC_NOTHING, 0, 0, nullptr};
+    return {MC_NOTHING, 0, 0, ""};
 }
 
 message_ctrl SHH::MessageHandler::PopOutgoingControlMessage()
@@ -106,7 +106,7 @@ message_ctrl SHH::MessageHandler::PopOutgoingControlMessage()
     {
 	return outqueueCtrl.Pop();
     }
-    return {MC_NOTHING, 0, 0, nullptr};
+    return {MC_NOTHING, 0, 0, ""};
 }
 
 message_sim SHH::MessageHandler::PopSimulationMessage()

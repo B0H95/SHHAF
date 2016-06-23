@@ -1,7 +1,6 @@
 #pragma once
 
 #include "log.hh"
-#include "heapmanager.hh"
 
 template <class T> class CircularContainer
 {
@@ -31,7 +30,7 @@ template <class T> CircularContainer<T>::CircularContainer(unsigned int newsize)
     end(0),
     list(nullptr)
 {
-    list = (T*)SHH::HeapManager::Allocate(sizeof(T) * newsize);
+    list = new T [newsize];
     if (list == nullptr)
     {
 	SHH::Log::Error("CircularContainer::CircularContainer(): Could not allocate memory for list.");
@@ -77,13 +76,14 @@ template <class T> bool CircularContainer<T>::Reinit(unsigned int newsize)
 {
     if (list != nullptr)
     {
-	SHH::HeapManager::Deallocate(list);
+	delete[] list;
+	list = nullptr;
     }
     maxsize = newsize;
     size = 0;
     start = 0;
     end = 0;
-    list = (T*)SHH::HeapManager::Allocate(sizeof(T) * newsize);
+    list = new T [newsize];
     if (list == nullptr)
     {
 	SHH::Log::Error("CircularContainer::Reinit(): Could not allocate memory for list.");
@@ -96,7 +96,7 @@ template <class T> void CircularContainer<T>::Deinit()
 {
     if (list != nullptr)
     {
-	SHH::HeapManager::Deallocate(list);
+	delete[] list;
 	list = nullptr;
     }
 }

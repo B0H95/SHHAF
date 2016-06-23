@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cstdint>
+#include <string>
 
 enum ostate
 {
@@ -63,7 +63,7 @@ struct object
     otype type;
     ostate state;
     odirection direction;
-    uint32_t syncindex;
+    unsigned int syncindex;
     float xaccel,yaccel,xspeed,yspeed,x,y,width,height;
 };
 
@@ -82,9 +82,9 @@ struct message_sim
 struct message_ctrl
 {
     mctype messagetype;
-    uint8_t sender;
-    uint8_t strsize;
-    char* str;
+    int sender;
+    int strsize;
+    std::string str;
 };
 
 // The function ordering reflects calling order
@@ -104,5 +104,17 @@ namespace SHH
 	environment CreateSolidEnvironment(float x, float y, float w, float h);
 	object CreateBasicObject(float x, float y, float w, float h);
 	object CreatePlayerObject(float x, float y, float w, float h);
+
+	std::string SerializeSimMessage(message_sim const& msg);
+	std::string SerializeCtrlMessage(message_ctrl const& msg);
+	std::string SerializeObject(object const& obj);
+	std::string SerializeInt(int value);
+	std::string SerializeFloat(float value);
+
+	message_sim DeserializeSimMessage(std::string str);
+	message_ctrl DeserializeCtrlMessage(std::string str);
+	object DeserializeObject(std::string str);
+	int DeserializeInt(std::string str);
+	float DeserializeFloat(std::string str);
     }
 }

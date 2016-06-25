@@ -6,6 +6,7 @@ void SHH::Units::CreateNoneObject(object& obj)
     obj.state = OS_IDLE;
     obj.direction = OD_NOWHERE;
     obj.syncindex = 0;
+    obj.owner = 0;
     obj.x = 0.0f;
     obj.y = 0.0f;
     obj.xspeed = 0.0f;
@@ -41,13 +42,13 @@ environment SHH::Units::CreateSolidEnvironment(float x, float y, float w, float 
 
 object SHH::Units::CreateBasicObject(float x, float y, float w, float h)
 {
-    object o = {OT_BASIC,OS_IDLE,OD_NOWHERE,0,0.0f,0.0f,0.0f,0.0f,x,y,w,h};
+    object o = {OT_BASIC,OS_IDLE,OD_NOWHERE,0,0,0.0f,0.0f,0.0f,0.0f,x,y,w,h};
     return o;
 }
 
 object SHH::Units::CreatePlayerObject(float x, float y, float w, float h)
 {
-    object o = {OT_PLAYER,OS_IDLE,OD_NOWHERE,0,0.0f,0.0f,0.0f,0.0f,x,y,w,h};
+    object o = {OT_PLAYER,OS_IDLE,OD_NOWHERE,0,0,0.0f,0.0f,0.0f,0.0f,x,y,w,h};
     return o;
 }
 
@@ -71,6 +72,7 @@ std::string SHH::Units::SerializeObject(object const& obj)
 	SerializeInt(obj.state) + "," +
 	SerializeInt(obj.direction) + "," +
 	SerializeInt(obj.syncindex) + "," +
+	SerializeInt(obj.owner) + "," +
 	SerializeFloat(obj.x) + "," +
 	SerializeFloat(obj.y) + "," +
 	SerializeFloat(obj.xspeed) + "," +
@@ -148,6 +150,10 @@ object SHH::Units::DeserializeObject(std::string str)
     
     separatorpos = str.find(",");
     returnobj.syncindex = DeserializeInt(str.substr(0, separatorpos));
+    str.erase(0, separatorpos + 1);
+
+    separatorpos = str.find(",");
+    returnobj.owner = DeserializeInt(str.substr(0, separatorpos));
     str.erase(0, separatorpos + 1);
     
     separatorpos = str.find(",");

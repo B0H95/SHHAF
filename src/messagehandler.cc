@@ -115,5 +115,5 @@ message_sim SHH::MessageHandler::PopSimulationMessage()
     {
 	return inqueueSim.Pop();
     }
-    return {MS_NOTHING, OT_NONE, OS_IDLE, OD_NOWHERE, 0, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
+    return {MS_NOTHING, OT_NONE, OS_IDLE, OD_NOWHERE, 0, 0, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
 }

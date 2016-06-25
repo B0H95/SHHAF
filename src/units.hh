@@ -64,6 +64,7 @@ struct object
     ostate state;
     odirection direction;
     unsigned int syncindex;
+    unsigned int owner;
     float xaccel,yaccel,xspeed,yspeed,x,y,width,height;
 };
 

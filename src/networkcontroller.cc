@@ -1,6 +1,7 @@
 #include "networkcontroller.hh"
 
 #include <thread>
+#include <string>
 #include "log.hh"
 #include "messagehandler.hh"
 #include "udpsocket.hh"
@@ -93,6 +94,16 @@ void SHH::NetworkController::SetServerAddress(std::string ipaddress)
     serveraddress = ipaddress;
 }
 
+bool SHH::NetworkController::SetupConnection()
+{
+    if (!SHH::UDP::Open(clientport))
+    {
+	SHH::Log::Warning("NetworkController::SetupConnection(): Could not setup connection.");
+	return false;
+    }
+    return true;
+}
+
 void SHH::NetworkController::SetMessagingMode(messaging_mode mmode)
 {
     messagingmode = mmode;
@@ -101,11 +112,45 @@ void SHH::NetworkController::SetMessagingMode(messaging_mode mmode)
 static void networkThreadMain()
 {
     SHH::Log::Log("networkThreadMain(): Started.");
+
+    message_ctrl cmsg;
+    message_sim smsg;
+    std::string received = "";
+
     while (running)
     {
-	if (SHH::MessageHandler::GetMessagingMode() != MM_OFFLINE)
+	if (messagingmode != MM_OFFLINE)
 	{
 	    //TODO: Start sending and receiving stuff
+	    if (messagingmode == MM_CLIENT)
+	    {		
+		while ((cmsg = SHH::MessageHandler::PopOutgoingControlMessage()).messagetype != MC_NOTHING)
+		{
+		    SHH::UDP::Send(SHH::Units::SerializeCtrlMessage(cmsg), serveraddress, serverport);
+		}
+		while ((received = SHH::UDP::Recv(serveraddress, serverport)) != "")
+		{
+		    smsg = SHH::Units::DeserializeSimMessage(received);
+		    if (smsg.obj.type == OT_PLAYER)
+		    {
+			smsg.obj.owner = 1;
+			smsg.obj.syncindex = 5000;
+		    }
+		    SHH::MessageHandler::PushSimulationMessage(smsg);
+		}
+	    }
+	    else if (messagingmode == MM_SERVER)
+	    {
+		while ((smsg = SHH::MessageHandler::PopSimulationMessage()).messagetype != MS_NOTHING)
+		{
+		    SHH::UDP::Send(SHH::Units::SerializeSimMessage(smsg), serveraddress, serverport);
+		}
+		while ((received = SHH::UDP::Recv(serveraddress, serverport)) != "")
+		{
+		    cmsg = SHH::Units::DeserializeCtrlMessage(received);
+		    SHH::MessageHandler::PushOutgoingControlMessage(cmsg);
+		}
+	    }
 	}
     }
     SHH::Log::Log("networkThreadMain(): Ended successfully.");

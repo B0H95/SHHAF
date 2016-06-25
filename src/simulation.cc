@@ -239,6 +239,13 @@ static void distributeIncomingControlMessages()
     {
 	SHH::Simulation::Behavior::PushControlMessage(msg);
     }
+    if (messagingMode == MM_SERVER)
+    {
+	while ((msg = SHH::MessageHandler::PopOutgoingControlMessage()).messagetype != MC_NOTHING && msg.messagetype < MC_MARKER_SIM)
+	{
+	    SHH::Simulation::Behavior::PushControlMessage(msg);
+	}
+    }
 }
 
 static void updateApplyBehaviors()

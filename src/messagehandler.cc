@@ -80,6 +80,17 @@ bool SHH::MessageHandler::PushControlMessage(message_ctrl const& msg)
     return true;
 }
 
+bool SHH::MessageHandler::PushOutgoingControlMessage(message_ctrl const& msg)
+{
+    if (!outqueueCtrl.Push(msg))
+    {
+	SHH::Log::Warning("MessageHandler::PushOutgoingControlMessage(): Outqueue is filled.");
+	return false;
+    }
+
+    return true;
+}
+
 bool SHH::MessageHandler::PushSimulationMessage(message_sim const& msg)
 {
     if (!inqueueSim.Push(msg))

@@ -11,6 +11,7 @@ namespace SHH
 	void SetMessagingMode(messaging_mode mmode);
 	messaging_mode GetMessagingMode();
 	bool PushControlMessage(message_ctrl const& msg);
+	bool PushOutgoingControlMessage(message_ctrl const& msg);
 	bool PushSimulationMessage(message_sim const& msg);
 	message_ctrl PopIncomingControlMessage();
 	message_ctrl PopOutgoingControlMessage();

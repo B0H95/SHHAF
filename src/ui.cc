@@ -124,6 +124,10 @@ void SHH::UI::SendMessage(std::string msg)
     {
 	SHH::NetworkController::SetServerAddress(param);
     }
+    else if (cmd == "SETUPCONNECTION")
+    {
+	SHH::NetworkController::SetupConnection();
+    }
 }
 
 static void drawFrameLoadBar()
@@ -150,7 +154,14 @@ static void drawSimulation()
 	    int y2 = int(objectList[i].y + objectList[i].height);
 	    if (objectList[i].type == OT_PLAYER)
 	    {
-		SHH::Window::SetColor(0x00, 0xFF, 0x00, 0xFF);
+		if (objectList[i].owner == 0)
+		{
+		    SHH::Window::SetColor(0x00, 0xFF, 0x00, 0xFF);
+		}
+		else
+		{
+		    SHH::Window::SetColor(0xFF, 0x00, 0x00, 0xFF);
+		}
 	    }
 	    SHH::Window::DrawRectangle(x1, y1, x2, y2);
 	}

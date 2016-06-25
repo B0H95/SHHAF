@@ -15,6 +15,7 @@ namespace SHH
 	void SetClientPort(uint32_t portnumber);
 	void SetServerPort(uint32_t portnumber);
 	void SetServerAddress(std::string ipaddress);
+	bool SetupConnection();
 	void SetMessagingMode(messaging_mode mmode);
     }
 }

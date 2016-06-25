@@ -8,6 +8,7 @@
 #include "simulation.hh"
 #include "units.hh"
 #include "messagehandler.hh"
+#include "networkcontroller.hh"
 
 static SHH::UI::Components::Console console;
 
@@ -82,6 +83,47 @@ void SHH::UI::ProcessInputs()
 void SHH::UI::SendMessage(std::string msg)
 {
     SHH::Log::Log(msg);
+
+    //TODO: Check for parsing errors
+
+    std::size_t separatorpos = msg.find(" ");
+    std::string cmd = msg.substr(0, separatorpos);
+    msg.erase(0, separatorpos + 1);
+    std::string param = msg;
+
+    if (cmd == "MODE")
+    {
+	if (param == "OFFLINE")
+	{
+	    SHH::Simulation::SetMessagingMode(MM_OFFLINE);
+	    SHH::MessageHandler::SetMessagingMode(MM_OFFLINE);
+	    SHH::NetworkController::SetMessagingMode(MM_OFFLINE);
+	}
+	else if (param == "CLIENT")
+	{
+	    SHH::Simulation::SetMessagingMode(MM_CLIENT);
+	    SHH::MessageHandler::SetMessagingMode(MM_CLIENT);
+	    SHH::NetworkController::SetMessagingMode(MM_CLIENT);
+	}
+	else if (param == "SERVER")
+	{
+	    SHH::Simulation::SetMessagingMode(MM_SERVER);
+	    SHH::MessageHandler::SetMessagingMode(MM_SERVER);
+	    SHH::NetworkController::SetMessagingMode(MM_SERVER);
+	}
+    }
+    else if (cmd == "CLIENTPORT")
+    {
+	SHH::NetworkController::SetClientPort(std::stoi(param));
+    }
+    else if (cmd == "SERVERPORT")
+    {
+	SHH::NetworkController::SetServerPort(std::stoi(param));
+    }
+    else if (cmd == "SERVERADDRESS")
+    {
+	SHH::NetworkController::SetServerAddress(param);
+    }
 }
 
 static void drawFrameLoadBar()

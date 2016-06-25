@@ -7,6 +7,10 @@
 
 static bool running = true;
 static std::thread* netthread = nullptr;
+static uint32_t clientport = 0;
+static uint32_t serverport = 0;
+static std::string serveraddress = "";
+static messaging_mode messagingmode = MM_OFFLINE;
 
 static void networkThreadMain();
 
@@ -72,6 +76,26 @@ void SHH::NetworkController::Stop()
 	delete netthread;
 	netthread = nullptr;
     }
+}
+
+void SHH::NetworkController::SetClientPort(uint32_t portnumber)
+{
+    clientport = portnumber;
+}
+
+void SHH::NetworkController::SetServerPort(uint32_t portnumber)
+{
+    serverport = portnumber;
+}
+
+void SHH::NetworkController::SetServerAddress(std::string ipaddress)
+{
+    serveraddress = ipaddress;
+}
+
+void SHH::NetworkController::SetMessagingMode(messaging_mode mmode)
+{
+    messagingmode = mmode;
 }
 
 static void networkThreadMain()

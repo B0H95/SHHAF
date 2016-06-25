@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+#include <string>
 #include "units.hh"
 
 namespace SHH
@@ -10,5 +12,9 @@ namespace SHH
 	void Deinit();
 	bool Run();
 	void Stop();
+	void SetClientPort(uint32_t portnumber);
+	void SetServerPort(uint32_t portnumber);
+	void SetServerAddress(std::string ipaddress);
+	void SetMessagingMode(messaging_mode mmode);
     }
 }

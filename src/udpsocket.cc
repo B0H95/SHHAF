@@ -7,6 +7,22 @@ static UDPsocket socket;
 static UDPpacket* packet = nullptr;
 static unsigned int psize;
 
+void ipaddr::Reset()
+{
+    ip.host = 0;
+    ip.port = 0;
+}
+
+bool ipaddr::InUse()
+{
+    return ip.host != 0 && ip.port != 0;
+}
+
+bool ipaddr::Equals(ipaddr const& other)
+{
+    return ip.host == other.ip.host && ip.port == other.ip.port; 
+}
+
 bool SHH::UDP::Init(unsigned int packetsize)
 {
     SHH::Log::Log("UDP::Init(): Started.");

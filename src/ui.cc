@@ -91,42 +91,46 @@ void SHH::UI::SendMessage(std::string msg)
     msg.erase(0, separatorpos + 1);
     std::string param = msg;
 
-    if (cmd == "MODE")
+    static uint32_t serverport = 0;
+
+    if (cmd == "LOCALPORT")
     {
-	if (param == "OFFLINE")
-	{
-	    SHH::Simulation::SetMessagingMode(MM_OFFLINE);
-	    SHH::MessageHandler::SetMessagingMode(MM_OFFLINE);
-	    SHH::NetworkController::SetMessagingMode(MM_OFFLINE);
-	}
-	else if (param == "CLIENT")
-	{
-	    SHH::Simulation::SetMessagingMode(MM_CLIENT);
-	    SHH::MessageHandler::SetMessagingMode(MM_CLIENT);
-	    SHH::NetworkController::SetMessagingMode(MM_CLIENT);
-	}
-	else if (param == "SERVER")
-	{
-	    SHH::Simulation::SetMessagingMode(MM_SERVER);
-	    SHH::MessageHandler::SetMessagingMode(MM_SERVER);
-	    SHH::NetworkController::SetMessagingMode(MM_SERVER);
-	}
-    }
-    else if (cmd == "CLIENTPORT")
-    {
-	SHH::NetworkController::SetClientPort(std::stoi(param));
+	SHH::NetworkController::OpenPort(std::stoi(param));
     }
     else if (cmd == "SERVERPORT")
     {
-	SHH::NetworkController::SetServerPort(std::stoi(param));
+	serverport = std::stoi(param);
     }
-    else if (cmd == "SERVERADDRESS")
+    else if (cmd == "STARTSERVER")
     {
-	SHH::NetworkController::SetServerAddress(param);
+	if (SHH::MessageHandler::GetMessagingMode() != MM_OFFLINE)
+	{
+	    SHH::Log::Warning("UI::SendMessage(): Must be in offline mode to start a server.");
+	    return;
+	}
+	SHH::Simulation::SetMessagingMode(MM_SERVER);
+	SHH::MessageHandler::SetMessagingMode(MM_SERVER);
+	SHH::NetworkController::SetMessagingMode(MM_SERVER);
     }
-    else if (cmd == "SETUPCONNECTION")
+    else if (cmd == "CONNECT")
     {
-	SHH::NetworkController::SetupConnection();
+	if (serverport == 0)
+	{
+	    SHH::Log::Warning("UI::SendMessage(): Must set SERVERPORT first.");
+	    return;
+	}
+	SHH::Simulation::FlushObjects();
+	SHH::Simulation::SetMessagingMode(MM_CLIENT);
+	SHH::MessageHandler::SetMessagingMode(MM_CLIENT);
+	SHH::NetworkController::SetMessagingMode(MM_CLIENT);
+	SHH::NetworkController::ConnectToServer(param, serverport);
+    }
+    else if (cmd == "MAP")
+    {
+	SHH::Simulation::SetMessagingMode(MM_OFFLINE);
+	SHH::MessageHandler::SetMessagingMode(MM_OFFLINE);
+	SHH::NetworkController::SetMessagingMode(MM_OFFLINE);
+	SHH::Simulation::LoadMap(param);
     }
 }
 

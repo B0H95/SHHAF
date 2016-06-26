@@ -217,6 +217,8 @@ bool SHH::Simulation::InsertEnvironment(environment const& env)
 bool SHH::Simulation::LoadMap(std::string mapname)
 {
     SHH::Log::Warning("Simulation::LoadMap(\"" + mapname + "\"): To be implemented, loading default instead.");
+    SHH::Simulation::FlushEnvironments();
+    SHH::Simulation::FlushObjects();
     SHH::Simulation::InsertEnvironment(SHH::Units::CreateSolidEnvironment(50.0f,500.0f,700.0f,50.0f));
     SHH::Simulation::InsertEnvironment(SHH::Units::CreateSolidEnvironment(50.0f,450.0f,150.0f,50.0f));
     SHH::Simulation::InsertEnvironment(SHH::Units::CreateSolidEnvironment(400.0f,490.0f,300.0f,10.0f));
@@ -230,6 +232,24 @@ bool SHH::Simulation::LoadMap(std::string mapname)
 void SHH::Simulation::SetMessagingMode(messaging_mode sm)
 {
     messagingMode = sm;
+}
+
+void SHH::Simulation::FlushEnvironments()
+{
+    for (int i = 0; i < environmentListSize; ++i)
+    {
+	environmentList[i].type = ET_NONE;
+    }
+    environmentListSize = 0;
+}
+
+void SHH::Simulation::FlushObjects()
+{
+    for (int i = 0; i < objectListSize; ++i)
+    {
+	objectList[i].type = OT_NONE;
+    }
+    objectListSize = 0;
 }
 
 static void distributeIncomingControlMessages()

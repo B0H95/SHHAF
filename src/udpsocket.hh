@@ -5,6 +5,10 @@
 struct ipaddr
 {
     IPaddress ip;
+
+    void Reset();
+    bool InUse();
+    bool Equals(ipaddr const& other);
 };
 
 namespace SHH

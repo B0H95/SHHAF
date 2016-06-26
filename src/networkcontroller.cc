@@ -1,5 +1,8 @@
 #include "networkcontroller.hh"
 
+#include "networkcontroller_client.hh"
+#include "networkcontroller_server.hh"
+
 #include <thread>
 #include <string>
 #include "log.hh"
@@ -9,11 +12,7 @@
 static bool running = true;
 static std::thread* netthread = nullptr;
 static uint32_t clientport = 0;
-static uint32_t serverport = 0;
-static std::string serveraddress = "";
 static messaging_mode messagingmode = MM_OFFLINE;
-static ipaddr destip;
-static ipaddr receivedip;
 
 static void networkThreadMain();
 
@@ -24,6 +23,21 @@ bool SHH::NetworkController::Init()
     if (!SHH::UDP::Init(512))
     {
 	SHH::Log::Error("NetworkController::Init(): Could not init UDP.");
+	return false;
+    }
+
+    if (!SHH::NetworkController::Server::Init())
+    {
+	SHH::Log::Error("NetworkController::Init(): Could not init server.");
+	SHH::UDP::Deinit();
+	return false;
+    }
+
+    if (!SHH::NetworkController::Client::Init())
+    {
+	SHH::Log::Error("NetworkController::Init(): Could not init client.");
+	SHH::NetworkController::Server::Deinit();
+	SHH::UDP::Deinit();
 	return false;
     }
 
@@ -45,6 +59,8 @@ void SHH::NetworkController::Deinit()
 	netthread = nullptr;
     }
 
+    SHH::NetworkController::Client::Deinit();
+    SHH::NetworkController::Server::Deinit();
     SHH::UDP::Deinit();
 
     SHH::Log::Log("NetworkController::Deinit(): Ended successfully.");
@@ -81,86 +97,63 @@ void SHH::NetworkController::Stop()
     }
 }
 
-void SHH::NetworkController::SetClientPort(uint32_t portnumber)
+bool SHH::NetworkController::OpenPort(uint32_t portnumber)
 {
-    SHH::Log::Log("NetworkController::SetClientPort(): Client port set to " + std::to_string(portnumber) + ".");
-    clientport = portnumber;
-}
-
-void SHH::NetworkController::SetServerPort(uint32_t portnumber)
-{
-    SHH::Log::Log("NetworkController::SetServerPort(): Server port set to " + std::to_string(portnumber) + ".");
-    serverport = portnumber;
-}
-
-void SHH::NetworkController::SetServerAddress(std::string ipaddress)
-{
-    SHH::Log::Log("NetworkController::SetServerAddress(): Server address set to " + ipaddress + ".");
-    serveraddress = ipaddress;
-}
-
-bool SHH::NetworkController::SetupConnection()
-{
-    SHH::Log::Log("NetworkController::SetupConnection(): Connection setup started.");
-    if (!SHH::UDP::Open(clientport))
+    SHH::Log::Log("NetworkController::OpenPort(" + std::to_string(portnumber) + "): Attempting to open port.");
+    if (!SHH::UDP::Open(portnumber))
     {
-	SHH::Log::Warning("NetworkController::SetupConnection(): Could not open port.");
+	SHH::Log::Error("NetworkController::OpenPort(" + std::to_string(portnumber) + "): Could not open port.");
 	return false;
     }
-    if (!SHH::UDP::GetIPAddress(&destip, serveraddress, serverport))
+    clientport = portnumber;
+    return true;
+}
+
+bool SHH::NetworkController::ConnectToServer(std::string destination, uint32_t portnumber)
+{
+    SHH::Log::Log("NetworkController::ConnectToServer(" + destination + ", " + std::to_string(portnumber) + "): Attempting to connect.");
+
+    if (messagingmode != MM_CLIENT)
     {
-	SHH::Log::Warning("NetworkController::SetupConnection(): Could not get ip address.");
-	return false;	
+	SHH::Log::Warning("NetworkController::ConnectToServer(): Must be in client mode.");
+	return false;
     }
+    
+    if (!SHH::NetworkController::Client::ConnectToServer(destination, portnumber))
+    {
+	SHH::Log::Error("NetworkController::Client::ConnectToServer(" + destination + ", " + std::to_string(portnumber) + "): Could not connect.");
+	return false;
+    }
+
     return true;
 }
 
 void SHH::NetworkController::SetMessagingMode(messaging_mode mmode)
 {
     messagingmode = mmode;
+    if (mmode == MM_CLIENT)
+    {
+	SHH::NetworkController::Client::Reset();
+    }
+    else if (mmode == MM_SERVER)
+    {
+	SHH::NetworkController::Server::Reset();
+    }
 }
 
 static void networkThreadMain()
 {
     SHH::Log::Log("networkThreadMain(): Started.");
 
-    message_ctrl cmsg;
-    message_sim smsg;
-    std::string received = "";
-
     while (running)
     {
-	if (messagingmode != MM_OFFLINE)
+	if (messagingmode == MM_CLIENT)
+	{		
+	    SHH::NetworkController::Client::HandleMessages();
+	}
+	else if (messagingmode == MM_SERVER)
 	{
-	    if (messagingmode == MM_CLIENT)
-	    {		
-		while ((cmsg = SHH::MessageHandler::PopOutgoingControlMessage()).messagetype != MC_NOTHING)
-		{
-		    SHH::UDP::Send(SHH::Units::SerializeCtrlMessage(cmsg), destip);
-		}
-		while ((received = SHH::UDP::Recv(&receivedip)) != "")
-		{
-		    smsg = SHH::Units::DeserializeSimMessage(received);
-		    if (smsg.obj.type == OT_PLAYER)
-		    {
-			smsg.obj.owner = 1;
-			smsg.obj.syncindex = 5000;
-		    }
-		    SHH::MessageHandler::PushSimulationMessage(smsg);
-		}
-	    }
-	    else if (messagingmode == MM_SERVER)
-	    {
-		while ((smsg = SHH::MessageHandler::PopSimulationMessage()).messagetype != MS_NOTHING)
-		{
-		    SHH::UDP::Send(SHH::Units::SerializeSimMessage(smsg), destip);
-		}
-		while ((received = SHH::UDP::Recv(&receivedip)) != "")
-		{
-		    cmsg = SHH::Units::DeserializeCtrlMessage(received);
-		    SHH::MessageHandler::PushOutgoingControlMessage(cmsg);
-		}
-	    }
+	    SHH::NetworkController::Server::HandleMessages();
 	}
     }
     SHH::Log::Log("networkThreadMain(): Ended successfully.");

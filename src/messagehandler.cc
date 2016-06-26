@@ -1,5 +1,6 @@
 #include "messagehandler.hh"
 
+#include <mutex>
 #include "log.hh"
 #include "circularcontainer.hh"
 
@@ -8,6 +9,8 @@ static messaging_mode messagingMode = MM_OFFLINE;
 static const int INQUEUE_CTRL_MAXSIZE = 100;
 static const int OUTQUEUE_CTRL_MAXSIZE = 100;
 static const int INQUEUE_SIM_MAXSIZE = 100;
+
+static std::mutex inqueuePushLock;
 
 static CircularContainer<message_ctrl> inqueueCtrl (INQUEUE_CTRL_MAXSIZE);
 static CircularContainer<message_ctrl> outqueueCtrl (OUTQUEUE_CTRL_MAXSIZE);
@@ -71,11 +74,14 @@ bool SHH::MessageHandler::PushControlMessage(message_ctrl const& msg)
 	return false;
     }
 
+    inqueuePushLock.lock();
     if (!inqueueCtrl.Push(msg))
     {
+	inqueuePushLock.unlock();
 	SHH::Log::Warning("MessageHandler::PushControlMessage(): Inqueue is filled.");
 	return false;
     }
+    inqueuePushLock.unlock();
 
     return true;
 }
@@ -87,6 +93,20 @@ bool SHH::MessageHandler::PushOutgoingControlMessage(message_ctrl const& msg)
 	SHH::Log::Warning("MessageHandler::PushOutgoingControlMessage(): Outqueue is filled.");
 	return false;
     }
+
+    return true;
+}
+
+bool SHH::MessageHandler::PushIncomingControlMessage(message_ctrl const& msg)
+{
+    inqueuePushLock.lock();
+    if (!inqueueCtrl.Push(msg))
+    {
+	inqueuePushLock.unlock();
+	SHH::Log::Warning("MessageHandler::PushIncomingControlMessage(): Inqueue is filled.");
+	return false;
+    }
+    inqueuePushLock.unlock();
 
     return true;
 }

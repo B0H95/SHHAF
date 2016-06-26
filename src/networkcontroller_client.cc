@@ -57,11 +57,6 @@ void SHH::NetworkController::Client::HandleMessages()
 	while ((received = SHH::UDP::Recv(&receivedip)) != "")
 	{
 	    smsg = SHH::Units::DeserializeSimMessage(received);
-	    if (smsg.obj.type == OT_PLAYER)
-	    {
-		smsg.obj.owner = 1;
-		smsg.obj.syncindex = 5000;
-	    }
 	    SHH::MessageHandler::PushSimulationMessage(smsg);
 	}
     }

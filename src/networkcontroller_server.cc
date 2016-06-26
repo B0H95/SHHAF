@@ -73,8 +73,8 @@ void SHH::NetworkController::Server::HandleMessages()
     while ((received = SHH::UDP::Recv(&receivedip)) != "")
     {
 	cmsg = SHH::Units::DeserializeCtrlMessage(received);
-	SHH::MessageHandler::PushOutgoingControlMessage(cmsg);
-	InsertClientIfNew(receivedip);
+	SHH::MessageHandler::PushIncomingControlMessage(cmsg);
+	InsertClientIfNew(receivedip); //TODO: Only call this once
     }
 }
 
@@ -86,7 +86,7 @@ static void InsertClientIfNew(ipaddr const& ip)
 	{
 	    return;
 	}
-	if (i == numclients - 1)
+	if (i == MAX_CLIENTS - 1)
 	{
 	    SHH::Log::Warning("NetworkController::Server InsertClientIfNew(): No more room for clients.");
 	    return;

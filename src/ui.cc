@@ -57,7 +57,7 @@ void SHH::UI::Draw()
 void SHH::UI::ProcessInputs()
 {
     message_ctrl msg;
-    msg.sender = 0;
+    msg.sender = SHH::Simulation::GetPlayerId();
     msg.strsize = 0;
     msg.str = "";
 
@@ -108,8 +108,8 @@ void SHH::UI::SendMessage(std::string msg)
 	    SHH::Log::Warning("UI::SendMessage(): Must be in offline mode to start a server.");
 	    return;
 	}
-	SHH::Simulation::SetMessagingMode(MM_SERVER);
 	SHH::MessageHandler::SetMessagingMode(MM_SERVER);
+	SHH::Simulation::SetMessagingMode(MM_SERVER);
 	SHH::NetworkController::SetMessagingMode(MM_SERVER);
     }
     else if (cmd == "CONNECT")
@@ -120,15 +120,15 @@ void SHH::UI::SendMessage(std::string msg)
 	    return;
 	}
 	SHH::Simulation::FlushObjects();
-	SHH::Simulation::SetMessagingMode(MM_CLIENT);
 	SHH::MessageHandler::SetMessagingMode(MM_CLIENT);
+	SHH::Simulation::SetMessagingMode(MM_CLIENT);
 	SHH::NetworkController::SetMessagingMode(MM_CLIENT);
 	SHH::NetworkController::ConnectToServer(param, serverport);
     }
     else if (cmd == "MAP")
     {
-	SHH::Simulation::SetMessagingMode(MM_OFFLINE);
 	SHH::MessageHandler::SetMessagingMode(MM_OFFLINE);
+	SHH::Simulation::SetMessagingMode(MM_OFFLINE);
 	SHH::NetworkController::SetMessagingMode(MM_OFFLINE);
 	SHH::Simulation::LoadMap(param);
     }
@@ -145,6 +145,7 @@ static void drawSimulation()
 {
     const object* objectList = SHH::Simulation::GetObjectList();
     int objectListSize = SHH::Simulation::GetObjectListSize();
+    unsigned int playerId = SHH::Simulation::GetPlayerId();
 
     for (int i = 0; i < objectListSize; ++i)
     {
@@ -158,7 +159,7 @@ static void drawSimulation()
 	    int y2 = int(objectList[i].y + objectList[i].height);
 	    if (objectList[i].type == OT_PLAYER)
 	    {
-		if (objectList[i].owner == 0)
+		if (objectList[i].owner == playerId)
 		{
 		    SHH::Window::SetColor(0x00, 0xFF, 0x00, 0xFF);
 		}

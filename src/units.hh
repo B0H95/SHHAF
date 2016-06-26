@@ -36,7 +36,8 @@ enum etype
 enum mstype
 {
     MS_NOTHING,
-    MS_OBJECTUPDATE
+    MS_OBJECTUPDATE,
+    MS_PLAYERIDENTIFICATION
 };
 
 enum mctype
@@ -47,6 +48,8 @@ enum mctype
     MC_JUMP,
 
     MC_MARKER_SIM,
+
+    MC_REQUESTID,
 
     MC_MARKER_CTRL
 };

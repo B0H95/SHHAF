@@ -21,5 +21,6 @@ namespace SHH
 	void SetMessagingMode(messaging_mode sm);
 	void FlushEnvironments();
 	void FlushObjects();
+	unsigned int GetPlayerId();
     }
 }

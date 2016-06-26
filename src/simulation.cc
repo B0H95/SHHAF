@@ -8,6 +8,8 @@
 #include "messagehandler.hh"
 
 static int newObjectIndex = 1;
+static unsigned int playerId = 0;
+static unsigned int connectingPlayerId = 1;
 static messaging_mode messagingMode = MM_OFFLINE;
 
 static const int OBJECT_LIST_SIZE = 100;
@@ -232,6 +234,17 @@ bool SHH::Simulation::LoadMap(std::string mapname)
 void SHH::Simulation::SetMessagingMode(messaging_mode sm)
 {
     messagingMode = sm;
+    if (sm == MM_CLIENT)
+    {
+	message_ctrl msg;
+	SHH::Units::CreateNoneControlMessage(msg);
+	msg.messagetype = MC_REQUESTID;
+	SHH::MessageHandler::PushControlMessage(msg);
+    }
+    if (sm == MM_SERVER)
+    {
+	connectingPlayerId = 1;
+    }
 }
 
 void SHH::Simulation::FlushEnvironments()
@@ -252,18 +265,34 @@ void SHH::Simulation::FlushObjects()
     objectListSize = 0;
 }
 
+unsigned int SHH::Simulation::GetPlayerId()
+{
+    return playerId;
+}
+
 static void distributeIncomingControlMessages()
 {
     message_ctrl msg;
-    while ((msg = SHH::MessageHandler::PopIncomingControlMessage()).messagetype != MC_NOTHING && msg.messagetype < MC_MARKER_SIM)
+    while ((msg = SHH::MessageHandler::PopIncomingControlMessage()).messagetype != MC_NOTHING)
     {
-	SHH::Simulation::Behavior::PushControlMessage(msg);
-    }
-    if (messagingMode == MM_SERVER)
-    {
-	while ((msg = SHH::MessageHandler::PopOutgoingControlMessage()).messagetype != MC_NOTHING && msg.messagetype < MC_MARKER_SIM)
+	if (msg.messagetype < MC_MARKER_SIM)
 	{
 	    SHH::Simulation::Behavior::PushControlMessage(msg);
+	}
+	else if (msg.messagetype < MC_MARKER_CTRL)
+	{
+	    if (msg.messagetype == MC_REQUESTID && messagingMode == MM_SERVER)
+	    {
+		object obj = SHH::Units::CreatePlayerObject(200.0f, 100.0f, 32.0f, 32.0f); //TODO: Add spawn points maybe...
+		obj.owner = connectingPlayerId;
+		++connectingPlayerId;
+		SHH::Simulation::InsertObject(obj);
+
+		message_sim msg;
+		msg.messagetype = MS_PLAYERIDENTIFICATION;		
+		msg.obj = obj;
+		SHH::MessageHandler::PushSimulationMessage(msg);
+	    }
 	}
     }
 }
@@ -283,21 +312,27 @@ static void handleIncomingSimulationMessages()
     message_sim msg;
     while ((msg = SHH::MessageHandler::PopSimulationMessage()).messagetype != MS_NOTHING)
     {
-	//TODO: Fix different actions for different message types (if there will ever be any)
-	bool objectFound = false;
-	for (int i = 0; i < objectListSize; ++i)
+	if (msg.messagetype == MS_OBJECTUPDATE)
 	{
-	    if (objectList[i].syncindex == msg.obj.syncindex)
+	    bool objectFound = false;
+	    for (int i = 0; i < objectListSize; ++i)
 	    {
-		objectFound = true;
-		objectList[i] = msg.obj; //TODO: Fix interpolation
-		break;
+		if (objectList[i].syncindex == msg.obj.syncindex)
+		{
+		    objectFound = true;
+		    objectList[i] = msg.obj; //TODO: Fix interpolation
+		    break;
+		}
+	    }
+	    
+	    if (!objectFound)
+	    {
+		insertUnsynchedObject(msg.obj);
 	    }
 	}
-	
-	if (!objectFound)
+	else if (msg.messagetype == MS_PLAYERIDENTIFICATION)
 	{
-	    insertUnsynchedObject(msg.obj);
+	    playerId = msg.obj.owner;
 	}
     }
 }

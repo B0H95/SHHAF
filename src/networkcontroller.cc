@@ -12,6 +12,8 @@ static uint32_t clientport = 0;
 static uint32_t serverport = 0;
 static std::string serveraddress = "";
 static messaging_mode messagingmode = MM_OFFLINE;
+static ipaddr destip;
+static ipaddr receivedip;
 
 static void networkThreadMain();
 
@@ -81,25 +83,34 @@ void SHH::NetworkController::Stop()
 
 void SHH::NetworkController::SetClientPort(uint32_t portnumber)
 {
+    SHH::Log::Log("NetworkController::SetClientPort(): Client port set to " + std::to_string(portnumber) + ".");
     clientport = portnumber;
 }
 
 void SHH::NetworkController::SetServerPort(uint32_t portnumber)
 {
+    SHH::Log::Log("NetworkController::SetServerPort(): Server port set to " + std::to_string(portnumber) + ".");
     serverport = portnumber;
 }
 
 void SHH::NetworkController::SetServerAddress(std::string ipaddress)
 {
+    SHH::Log::Log("NetworkController::SetServerAddress(): Server address set to " + ipaddress + ".");
     serveraddress = ipaddress;
 }
 
 bool SHH::NetworkController::SetupConnection()
 {
+    SHH::Log::Log("NetworkController::SetupConnection(): Connection setup started.");
     if (!SHH::UDP::Open(clientport))
     {
-	SHH::Log::Warning("NetworkController::SetupConnection(): Could not setup connection.");
+	SHH::Log::Warning("NetworkController::SetupConnection(): Could not open port.");
 	return false;
+    }
+    if (!SHH::UDP::GetIPAddress(&destip, serveraddress, serverport))
+    {
+	SHH::Log::Warning("NetworkController::SetupConnection(): Could not get ip address.");
+	return false;	
     }
     return true;
 }
@@ -121,14 +132,13 @@ static void networkThreadMain()
     {
 	if (messagingmode != MM_OFFLINE)
 	{
-	    //TODO: Start sending and receiving stuff
 	    if (messagingmode == MM_CLIENT)
 	    {		
 		while ((cmsg = SHH::MessageHandler::PopOutgoingControlMessage()).messagetype != MC_NOTHING)
 		{
-		    SHH::UDP::Send(SHH::Units::SerializeCtrlMessage(cmsg), serveraddress, serverport);
+		    SHH::UDP::Send(SHH::Units::SerializeCtrlMessage(cmsg), destip);
 		}
-		while ((received = SHH::UDP::Recv(serveraddress, serverport)) != "")
+		while ((received = SHH::UDP::Recv(&receivedip)) != "")
 		{
 		    smsg = SHH::Units::DeserializeSimMessage(received);
 		    if (smsg.obj.type == OT_PLAYER)
@@ -143,9 +153,9 @@ static void networkThreadMain()
 	    {
 		while ((smsg = SHH::MessageHandler::PopSimulationMessage()).messagetype != MS_NOTHING)
 		{
-		    SHH::UDP::Send(SHH::Units::SerializeSimMessage(smsg), serveraddress, serverport);
+		    SHH::UDP::Send(SHH::Units::SerializeSimMessage(smsg), destip);
 		}
-		while ((received = SHH::UDP::Recv(serveraddress, serverport)) != "")
+		while ((received = SHH::UDP::Recv(&receivedip)) != "")
 		{
 		    cmsg = SHH::Units::DeserializeCtrlMessage(received);
 		    SHH::MessageHandler::PushOutgoingControlMessage(cmsg);

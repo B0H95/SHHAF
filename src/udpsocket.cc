@@ -1,6 +1,7 @@
 #include "udpsocket.hh"
 
-#include <iostream>
+#include <string>
+#include "log.hh"
 
 static UDPsocket socket;
 static UDPpacket* packet = nullptr;
@@ -8,30 +9,40 @@ static unsigned int psize;
 
 bool SHH::UDP::Init(unsigned int packetsize)
 {
+    SHH::Log::Log("UDP::Init(): Started.");
+
     if (SDLNet_Init() == -1)
     {
+	SHH::Log::Error("UDP::Init(): SDLNet_Init error.");
 	return false;
     }
     packet = SDLNet_AllocPacket(packetsize);
     if (packet == nullptr)
     {
+	SHH::Log::Error("UDP::Init(): SDLNet_AllocPacket error.");
 	return false;
     }
     psize = packetsize;
+
+    SHH::Log::Log("UDP::Init(): Ended successfully.");
     return true;
 }
 
 void SHH::UDP::Deinit()
 {
+    SHH::Log::Log("UDP::Deinit(): Started.");
     SDLNet_FreePacket(packet);
     SDLNet_Quit();
+    SHH::Log::Log("UDP::Deinit(): Ended successfully.");
 }
 
 bool SHH::UDP::Open(uint32_t portnumber)
 {
+    SHH::Log::Log("UDP::Open(): Trying to open port " + std::to_string(portnumber) + ".");
     socket = SDLNet_UDP_Open(portnumber);
     if (socket == nullptr)
     {
+	SHH::Log::Error("UDP::Open(): Could not open port.");
 	return false;
     }
     return true;

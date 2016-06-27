@@ -75,7 +75,7 @@ void SHH::NetworkController::Server::HandleMessages()
     message_sim smsg;
     std::string received = "";
     ipaddr receivedip;
-
+    
     while ((smsg = SHH::MessageHandler::PopSimulationMessage()).messagetype != MS_NOTHING)
     {
 	std::string serializedMessage = SHH::Units::SerializeSimMessage(smsg);

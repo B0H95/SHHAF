@@ -49,7 +49,7 @@ enum mctype
 
     MC_MARKER_SIM,
 
-    MC_REQUESTID,
+    MC_RESPAWN,
 
     MC_MARKER_CTRL
 };

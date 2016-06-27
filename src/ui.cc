@@ -76,6 +76,13 @@ void SHH::UI::ProcessInputs()
 	msg.messagetype = MC_JUMP;
 	SHH::MessageHandler::PushControlMessage(msg);
     }
+    if (SHH::Window::IsKeyPressed("r"))
+    {
+	message_ctrl msg;
+	SHH::Units::CreateNoneControlMessage(msg);
+	msg.messagetype = MC_RESPAWN;
+	SHH::MessageHandler::PushControlMessage(msg);
+    }
 
     console.ProcessInputs();
 }

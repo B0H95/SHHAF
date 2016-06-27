@@ -35,10 +35,11 @@ bool SHH::NetworkController::Client::ConnectToServer(std::string destination, ui
 {
     if (!SHH::UDP::GetIPAddress(&destip, destination, portnumber))
     {
-	SHH::Log::Warning("NetworkController::Client::ConnectToServer(" + destination + ", " + std::to_string(portnumber) + "): Could not connect.");
+	SHH::Log::Warning("NetworkController::Client::ConnectToServer(" + destination + ", " + std::to_string(portnumber) + "): Could not resolve address.");
 	return false;
     }
     connected = true;
+    SHH::UDP::Send("nxc", destip); //TODO: Handle packet loss
     return true;
 }
 
@@ -60,4 +61,13 @@ void SHH::NetworkController::Client::HandleMessages()
 	    SHH::MessageHandler::PushSimulationMessage(smsg);
 	}
     }
+}
+
+void SHH::NetworkController::Client::Disconnect()
+{
+    if (connected)
+    {
+	SHH::UDP::Send("nxd", destip);
+    }
+    connected = false;
 }

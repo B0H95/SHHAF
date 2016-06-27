@@ -14,6 +14,7 @@ namespace SHH
 	    void Reset();
 	    bool ConnectToServer(std::string destination, uint32_t portnumber);
 	    void HandleMessages();
+	    void Disconnect();
 	}
     }
 }

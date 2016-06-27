@@ -7,9 +7,13 @@
 #include "programcontroller.hh"
 #include "messagehandler.hh"
 
+struct player_info
+{
+    bool alive;
+};
+
 static int newObjectIndex = 1;
 static unsigned int playerId = 0;
-static unsigned int connectingPlayerId = 1;
 static messaging_mode messagingMode = MM_OFFLINE;
 
 static const int OBJECT_LIST_SIZE = 100;
@@ -20,6 +24,9 @@ static int objectListSize = 0;
 static const int ENVIRONMENT_LIST_SIZE = 100;
 static environment* environmentList = nullptr;
 static int environmentListSize = 0;
+
+static const int PLAYERINFO_LIST_SIZE = 100;
+static player_info playerinfoList [PLAYERINFO_LIST_SIZE];
 
 static void distributeIncomingControlMessages();
 static void updateApplyBehaviors();
@@ -91,6 +98,12 @@ bool SHH::Simulation::Init()
     {
 	SHH::Units::CreateNoneEnvironment(environmentList[i]);
     }
+
+    for (int i = 0; i < PLAYERINFO_LIST_SIZE; ++i)
+    {
+	playerinfoList[i].alive = false;
+    }
+    playerinfoList[0].alive = true;
 
     SHH::Log::Log("Simulation::Init(): Ended successfully.");
     return true;
@@ -234,17 +247,6 @@ bool SHH::Simulation::LoadMap(std::string mapname)
 void SHH::Simulation::SetMessagingMode(messaging_mode sm)
 {
     messagingMode = sm;
-    if (sm == MM_CLIENT)
-    {
-	message_ctrl msg;
-	SHH::Units::CreateNoneControlMessage(msg);
-	msg.messagetype = MC_REQUESTID;
-	SHH::MessageHandler::PushControlMessage(msg);
-    }
-    if (sm == MM_SERVER)
-    {
-	connectingPlayerId = 1;
-    }
 }
 
 void SHH::Simulation::FlushEnvironments()
@@ -281,17 +283,16 @@ static void distributeIncomingControlMessages()
 	}
 	else if (msg.messagetype < MC_MARKER_CTRL)
 	{
-	    if (msg.messagetype == MC_REQUESTID && messagingMode == MM_SERVER)
+	    if (msg.messagetype == MC_RESPAWN && messagingMode == MM_SERVER)
 	    {
+		if (playerinfoList[msg.sender].alive) //TODO: Fix a better way to handle player info
+		{
+		    continue;
+		}
 		object obj = SHH::Units::CreatePlayerObject(200.0f, 100.0f, 32.0f, 32.0f); //TODO: Add spawn points maybe...
-		obj.owner = connectingPlayerId;
-		++connectingPlayerId;
+		obj.owner = msg.sender;
 		SHH::Simulation::InsertObject(obj);
-
-		message_sim msg;
-		msg.messagetype = MS_PLAYERIDENTIFICATION;		
-		msg.obj = obj;
-		SHH::MessageHandler::PushSimulationMessage(msg);
+		playerinfoList[msg.sender].alive = true;
 	    }
 	}
     }

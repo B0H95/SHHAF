@@ -139,6 +139,10 @@ void SHH::NetworkController::SetMessagingMode(messaging_mode mmode)
     {
 	SHH::NetworkController::Server::Reset();
     }
+    if (mmode == MM_OFFLINE)
+    {
+	SHH::NetworkController::Client::Disconnect();
+    }
 }
 
 static void networkThreadMain()

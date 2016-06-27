@@ -132,12 +132,19 @@ void SHH::UI::SendMessage(std::string msg)
 	SHH::NetworkController::SetMessagingMode(MM_CLIENT);
 	SHH::NetworkController::ConnectToServer(param, serverport);
     }
-    else if (cmd == "MAP")
+    else if (cmd == "MAP") //TODO: Go to offline mode properly
     {
 	SHH::MessageHandler::SetMessagingMode(MM_OFFLINE);
 	SHH::Simulation::SetMessagingMode(MM_OFFLINE);
 	SHH::NetworkController::SetMessagingMode(MM_OFFLINE);
 	SHH::Simulation::LoadMap(param);
+    }
+    else if (cmd == "DISCONNECT")
+    {
+	SHH::MessageHandler::SetMessagingMode(MM_OFFLINE);
+	SHH::Simulation::SetMessagingMode(MM_OFFLINE);
+	SHH::NetworkController::SetMessagingMode(MM_OFFLINE);
+	SHH::Simulation::LoadMap("default");
     }
 }
 

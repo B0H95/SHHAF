@@ -4,6 +4,7 @@
 #include "log.hh"
 
 static UDPsocket socket;
+static bool opened = false;
 static UDPpacket* packet = nullptr;
 static unsigned int psize;
 
@@ -47,6 +48,12 @@ bool SHH::UDP::Init(unsigned int packetsize)
 void SHH::UDP::Deinit()
 {
     SHH::Log::Log("UDP::Deinit(): Started.");
+
+    if (opened)
+    {
+	SDLNet_UDP_Close(socket);
+    }
+
     SDLNet_FreePacket(packet);
     SDLNet_Quit();
     SHH::Log::Log("UDP::Deinit(): Ended successfully.");
@@ -55,12 +62,19 @@ void SHH::UDP::Deinit()
 bool SHH::UDP::Open(uint32_t portnumber)
 {
     SHH::Log::Log("UDP::Open(): Trying to open port " + std::to_string(portnumber) + ".");
+
+    if (opened)
+    {
+	SDLNet_UDP_Close(socket);
+    }
+
     socket = SDLNet_UDP_Open(portnumber);
     if (socket == nullptr)
     {
 	SHH::Log::Error("UDP::Open(): Could not open port.");
 	return false;
     }
+    opened = true;
     return true;
 }
 

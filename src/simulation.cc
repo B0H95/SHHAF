@@ -237,9 +237,9 @@ bool SHH::Simulation::LoadMap(std::string mapname)
     SHH::Simulation::InsertEnvironment(SHH::Units::CreateSolidEnvironment(50.0f,500.0f,700.0f,50.0f));
     SHH::Simulation::InsertEnvironment(SHH::Units::CreateSolidEnvironment(50.0f,450.0f,150.0f,50.0f));
     SHH::Simulation::InsertEnvironment(SHH::Units::CreateSolidEnvironment(400.0f,490.0f,300.0f,10.0f));
-    SHH::Simulation::InsertObject(SHH::Units::CreateBasicObject(100.0f,100.0f,32.0f,32.0f));
-    SHH::Simulation::InsertObject(SHH::Units::CreateBasicObject(300.0f,350.0f,32.0f,32.0f));
-    SHH::Simulation::InsertObject(SHH::Units::CreateBasicObject(600.0f,450.0f,32.0f,32.0f));
+    //SHH::Simulation::InsertObject(SHH::Units::CreateBasicObject(100.0f,100.0f,32.0f,32.0f));
+    //SHH::Simulation::InsertObject(SHH::Units::CreateBasicObject(300.0f,350.0f,32.0f,32.0f));
+    //SHH::Simulation::InsertObject(SHH::Units::CreateBasicObject(600.0f,450.0f,32.0f,32.0f));
     SHH::Simulation::InsertObject(SHH::Units::CreatePlayerObject(400.0f,300.0f,32.0f,32.0f));
     return true;
 }

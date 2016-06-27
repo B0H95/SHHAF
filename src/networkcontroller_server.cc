@@ -21,6 +21,7 @@ static void InsertClientIfNew(ipaddr const& ip);
 static void DeleteClientIfExists(ipaddr const& ip);
 static int ClientId(ipaddr const& ip);
 static void HandleIncomingMessage(std::string const& msg, ipaddr const& sender);
+static void SendPlayerIdentificationMessage(ipaddr const& ip, unsigned int id);
 
 bool SHH::NetworkController::Server::Init()
 {
@@ -95,6 +96,7 @@ static void InsertClientIfNew(ipaddr const& ip)
     {
 	if (clients[i].ip.Equals(ip))
 	{
+	    SendPlayerIdentificationMessage(ip, clients[i].id);
 	    return;
 	}
 	if (i == MAX_CLIENTS - 1)
@@ -106,10 +108,7 @@ static void InsertClientIfNew(ipaddr const& ip)
     clients[numclients].ip = ip;
     clients[numclients].id = playerid;
 
-    message_sim playerIdMessage;
-    playerIdMessage.messagetype = MS_PLAYERIDENTIFICATION;
-    playerIdMessage.obj.owner = playerid;
-    SHH::UDP::Send(SHH::Units::SerializeSimMessage(playerIdMessage), ip);
+    SendPlayerIdentificationMessage(ip, playerid);
 
     ++playerid;
     ++numclients;
@@ -163,4 +162,12 @@ static void HandleIncomingMessage(std::string const& msg, ipaddr const& sender)
 	cmsg.sender = clientid;
 	SHH::MessageHandler::PushIncomingControlMessage(cmsg);
     }
+}
+
+static void SendPlayerIdentificationMessage(ipaddr const& ip, unsigned int id)
+{
+    message_sim playerIdMessage;
+    playerIdMessage.messagetype = MS_PLAYERIDENTIFICATION;
+    playerIdMessage.obj.owner = id;
+    SHH::UDP::Send(SHH::Units::SerializeSimMessage(playerIdMessage), ip);   
 }

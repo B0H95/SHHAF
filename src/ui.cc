@@ -1,5 +1,6 @@
 #include "ui.hh"
 
+#include "ui_commands.hh"
 #include "ui_components_console.hh"
 
 #include "log.hh"
@@ -102,7 +103,7 @@ void SHH::UI::SendMessage(std::string msg)
 
     if (cmd == "LOCALPORT")
     {
-	SHH::NetworkController::OpenPort(std::stoi(param));
+	SHH::UI::Commands::SetLocalPort(std::stoi(param));
     }
     else if (cmd == "SERVERPORT")
     {
@@ -110,14 +111,7 @@ void SHH::UI::SendMessage(std::string msg)
     }
     else if (cmd == "STARTSERVER")
     {
-	if (SHH::MessageHandler::GetMessagingMode() != MM_OFFLINE)
-	{
-	    SHH::Log::Warning("UI::SendMessage(): Must be in offline mode to start a server.");
-	    return;
-	}
-	SHH::MessageHandler::SetMessagingMode(MM_SERVER);
-	SHH::Simulation::SetMessagingMode(MM_SERVER);
-	SHH::NetworkController::SetMessagingMode(MM_SERVER);
+	SHH::UI::Commands::StartServer();
     }
     else if (cmd == "CONNECT")
     {
@@ -126,25 +120,15 @@ void SHH::UI::SendMessage(std::string msg)
 	    SHH::Log::Warning("UI::SendMessage(): Must set SERVERPORT first.");
 	    return;
 	}
-	SHH::Simulation::FlushObjects();
-	SHH::MessageHandler::SetMessagingMode(MM_CLIENT);
-	SHH::Simulation::SetMessagingMode(MM_CLIENT);
-	SHH::NetworkController::SetMessagingMode(MM_CLIENT);
-	SHH::NetworkController::ConnectToServer(param, serverport);
+	SHH::UI::Commands::Connect(param, serverport);
     }
-    else if (cmd == "MAP") //TODO: Go to offline mode properly
+    else if (cmd == "MAP")
     {
-	SHH::MessageHandler::SetMessagingMode(MM_OFFLINE);
-	SHH::Simulation::SetMessagingMode(MM_OFFLINE);
-	SHH::NetworkController::SetMessagingMode(MM_OFFLINE);
-	SHH::Simulation::LoadMap(param);
+	SHH::UI::Commands::Map(param);
     }
     else if (cmd == "DISCONNECT")
     {
-	SHH::MessageHandler::SetMessagingMode(MM_OFFLINE);
-	SHH::Simulation::SetMessagingMode(MM_OFFLINE);
-	SHH::NetworkController::SetMessagingMode(MM_OFFLINE);
-	SHH::Simulation::LoadMap("default");
+	SHH::UI::Commands::Disconnect();
     }
 }
 

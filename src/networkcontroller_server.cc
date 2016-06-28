@@ -120,6 +120,11 @@ static void DeleteClientIfExists(ipaddr const& ip)
     {
 	if (clients[i].ip.Equals(ip))
 	{
+	    message_ctrl dcmsg;
+	    SHH::Units::CreateNoneControlMessage(dcmsg);
+	    dcmsg.messagetype = MC_DISCONNECT;
+	    dcmsg.sender = clients[i].id;
+	    SHH::MessageHandler::PushIncomingControlMessage(dcmsg);
 	    clients[i].ip.Reset();
 	    clients[i].id = 0;
 	    clients[i] = clients[numclients - 1];

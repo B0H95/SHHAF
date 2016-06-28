@@ -128,6 +128,14 @@ bool SHH::NetworkController::ConnectToServer(std::string destination, uint32_t p
     return true;
 }
 
+void SHH::NetworkController::Disconnect()
+{
+    if (messagingmode == MM_CLIENT)
+    {
+	SHH::NetworkController::Client::Disconnect();
+    }
+}
+
 void SHH::NetworkController::SetMessagingMode(messaging_mode mmode)
 {
     messagingmode = mmode;

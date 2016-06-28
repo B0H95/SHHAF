@@ -37,7 +37,8 @@ enum mstype
 {
     MS_NOTHING,
     MS_OBJECTUPDATE,
-    MS_PLAYERIDENTIFICATION
+    MS_PLAYERIDENTIFICATION,
+    MS_DELETEOBJECT
 };
 
 enum mctype
@@ -50,6 +51,7 @@ enum mctype
     MC_MARKER_SIM,
 
     MC_RESPAWN,
+    MC_DISCONNECT,
 
     MC_MARKER_CTRL
 };

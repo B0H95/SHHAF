@@ -294,6 +294,10 @@ static void distributeIncomingControlMessages()
 		SHH::Simulation::InsertObject(obj);
 		playerinfoList[msg.sender].alive = true;
 	    }
+	    else if (msg.messagetype == MC_DISCONNECT && messagingMode == MM_SERVER)
+	    {
+		
+	    }
 	}
     }
 }

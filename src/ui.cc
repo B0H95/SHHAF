@@ -10,6 +10,7 @@
 #include "units.hh"
 #include "messagehandler.hh"
 #include "networkcontroller.hh"
+#include "util.hh"
 
 static SHH::UI::Components::Console console;
 
@@ -103,11 +104,11 @@ void SHH::UI::SendMessage(std::string msg)
 
     if (cmd == "LOCALPORT")
     {
-	SHH::UI::Commands::SetLocalPort(std::stoi(param));
+	SHH::UI::Commands::SetLocalPort(SHH::Util::StringToInt(param));
     }
     else if (cmd == "SERVERPORT")
     {
-	serverport = std::stoi(param);
+	serverport = SHH::Util::StringToInt(param);
     }
     else if (cmd == "STARTSERVER")
     {

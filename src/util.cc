@@ -23,7 +23,7 @@ std::string SHH::Util::IntToString(int value)
     return str;
 }
 
-int SHH::Util::StringToInt(std::string value)
+int SHH::Util::StringToInt(std::string const& value)
 {
     int returnval = 0;
     int multiplier = 1;

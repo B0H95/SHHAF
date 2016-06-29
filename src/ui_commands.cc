@@ -2,6 +2,7 @@
 
 #include "networkcontroller.hh"
 #include "simulation.hh"
+#include "simulation_map.hh"
 #include "messagehandler.hh"
 #include "log.hh"
 #include "units.hh"
@@ -26,7 +27,7 @@ bool SHH::UI::Commands::StartServer()
 
 bool SHH::UI::Commands::Connect(std::string serverip, uint32_t serverport)
 {
-    SHH::Simulation::FlushObjects();
+    SHH::Simulation::Map::FlushObjects(); //TODO: Fix something in Simulation instead
     SetGlobalMessagingMode(MM_CLIENT);
     SHH::NetworkController::ConnectToServer(serverip, serverport);
     return true;

@@ -18,5 +18,6 @@ namespace SHH
 	bool LoadMap(std::string mapname);
 	void SetMessagingMode(messaging_mode sm);
 	unsigned int GetPlayerId();
+	void SetPlayerId(unsigned int pid);
     }
 }

@@ -78,7 +78,7 @@ void SHH::UI::ProcessInputs()
 	msg.messagetype = MC_JUMP;
 	SHH::MessageHandler::PushControlMessage(msg);
     }
-    if (SHH::Window::IsKeyPressed("r"))
+    if (SHH::Window::IsKeyPressed("r") && !console.Visible())
     {
 	message_ctrl msg;
 	SHH::Units::CreateNoneControlMessage(msg);

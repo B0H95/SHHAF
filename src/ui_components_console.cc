@@ -84,3 +84,8 @@ void SHH::UI::Components::Console::Draw()
     std::string inputLine = "> " + input + " <";
     SHH::Window::DrawText(inputLine, 0, amountOfLines * fontHeight);
 }
+
+bool SHH::UI::Components::Console::Visible()
+{
+    return visible;
+}

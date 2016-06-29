@@ -15,6 +15,7 @@ namespace SHH
 		void Deinit();
 		void ProcessInputs();
 		void Draw();
+		bool Visible();
 
 	    private:
 		bool visible;

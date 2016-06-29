@@ -19,6 +19,9 @@ namespace SHH
 	    bool LoadMap(std::string mapname);
 	    void FlushEnvironments();
 	    void FlushObjects();
+	    bool PushControlMessage(message_ctrl* msg);
+	    bool PushSimulationMessage(message_sim* msg);
+	    void HandleMessages();
 
 	    //TEMP
 	    bool InsertObject(object const& obj);

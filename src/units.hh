@@ -97,7 +97,7 @@ struct message_ctrl
 struct behavior
 {
     void (*OnUpdate)(object& obj);
-    void (*OnMessage)(message_ctrl const& msg, object& obj);
+    void (*OnMessage)(message_ctrl* msg, object& obj);
 };
 
 namespace SHH

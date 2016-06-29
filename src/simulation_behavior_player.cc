@@ -7,11 +7,11 @@ void OT_PLAYER_OnUpdate(object& obj)
     obj.xspeed = 0.0f;
 }
 
-void OT_PLAYER_OnMessage(message_ctrl const& msg, object& obj)
+void OT_PLAYER_OnMessage(message_ctrl* msg, object& obj)
 {
-    unsigned int id = (unsigned int)msg.sender;
+    unsigned int id = (unsigned int)msg->sender;
     
-    switch (msg.messagetype)
+    switch (msg->messagetype)
     {
     case MC_NOTHING:
 	break;

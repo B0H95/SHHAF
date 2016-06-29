@@ -7,7 +7,7 @@
 static behavior behaviorList [OT_MAXVALUE];
 
 static const int CONTROL_EVENT_LIST_MAXSIZE = 100;
-static message_ctrl* controlEventList = nullptr;
+static message_ctrl** controlEventList = nullptr;
 static int controlEventListStart = 0;
 static int controlEventListEnd = 0;
 static int controlEventListSize = 0;
@@ -25,16 +25,11 @@ bool SHH::Simulation::Behavior::Init()
     behaviorList[OT_PLAYER].OnUpdate = OT_PLAYER_OnUpdate;
     behaviorList[OT_PLAYER].OnMessage = OT_PLAYER_OnMessage;
 
-    controlEventList = new message_ctrl [CONTROL_EVENT_LIST_MAXSIZE];
+    controlEventList = new message_ctrl* [CONTROL_EVENT_LIST_MAXSIZE];
     if (controlEventList == nullptr)
     {
 	SHH::Log::Error("Simulation::Behavior::Init(): Could not allocate memory for controlEventList.");
 	return false;
-    }
-
-    for (int i = 0; i < CONTROL_EVENT_LIST_MAXSIZE; ++i)
-    {
-	SHH::Units::CreateNoneControlMessage(controlEventList[i]);
     }
 
     SHH::Log::Log("Simulation::Behavior::Init(): Ended successfully.");
@@ -54,14 +49,13 @@ void SHH::Simulation::Behavior::Deinit()
     SHH::Log::Log("Simulation::Behavior::Deinit(): Ended successfully.");
 }
 
-bool SHH::Simulation::Behavior::PushControlMessage(message_ctrl const& msg)
+bool SHH::Simulation::Behavior::PushControlMessage(message_ctrl* msg)
 {
     if (controlEventListSize >= CONTROL_EVENT_LIST_MAXSIZE)
     {
 	SHH::Log::Warning("Simulation::Behavior::PushControlMessage(): Not enough space in controlEventList.");
 	return false;
     }
-    
     controlEventList[controlEventListEnd] = msg;
     controlEventListEnd = (controlEventListEnd + 1) % CONTROL_EVENT_LIST_MAXSIZE;
     controlEventListSize++;

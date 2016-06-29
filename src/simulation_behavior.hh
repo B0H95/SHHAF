@@ -10,7 +10,7 @@ namespace SHH
 	{
 	    bool Init();
 	    void Deinit();
-	    bool PushControlMessage(message_ctrl const& msg);
+	    bool PushControlMessage(message_ctrl* msg);
 	    void ApplyBehaviors(object* olist, object* obrlist, int olistsize);
 	}
     }

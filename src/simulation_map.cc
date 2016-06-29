@@ -13,8 +13,17 @@ static const unsigned int ENVIRONMENT_LIST_SIZE = 100;
 static environment* environmentList = nullptr;
 static unsigned int environmentListSize = 0;
 
+static const unsigned int CTRL_MESSAGE_LIST_SIZE = 100;
+static message_ctrl** ctrlMessageList = nullptr;
+static unsigned int ctrlMessageListSize = 0;
+
+static const unsigned int SIM_MESSAGE_LIST_SIZE = 100;
+static message_sim** simMessageList = nullptr;
+static unsigned int simMessageListSize = 0;
+
 //static bool InsertObject(object const& obj);
 //static bool InsertEnvironment(environment const& env);
+static bool insertUnsynchedObject(object const& obj);
 
 bool SHH::Simulation::Map::Init()
 {
@@ -40,6 +49,34 @@ bool SHH::Simulation::Map::Init()
     if (objectBehaviorRequests == nullptr)
     {
 	SHH::Log::Error("Simulation::Map::Init(): Could not allocate memory for objectBehaviorRequests.");
+	delete[] environmentList;
+	environmentList = nullptr;
+	delete[] objectList;
+	objectList = nullptr;
+	return false;
+    }
+
+    ctrlMessageList = new message_ctrl* [CTRL_MESSAGE_LIST_SIZE];
+    if (ctrlMessageList == nullptr)
+    {
+	SHH::Log::Error("Simulation::Map::Init(): Could not allocate memory for ctrlMessageList.");
+	delete[] objectBehaviorRequests;
+	objectBehaviorRequests = nullptr;
+	delete[] environmentList;
+	environmentList = nullptr;
+	delete[] objectList;
+	objectList = nullptr;
+	return false;
+    }
+
+    simMessageList = new message_sim* [SIM_MESSAGE_LIST_SIZE];
+    if (simMessageList == nullptr)
+    {
+	SHH::Log::Error("Simulation::Map::Init(): Could not allocate memory for simMessageList.");
+	delete[] ctrlMessageList;
+	ctrlMessageList = nullptr;
+	delete[] objectBehaviorRequests;
+	objectBehaviorRequests = nullptr;
 	delete[] environmentList;
 	environmentList = nullptr;
 	delete[] objectList;
@@ -81,6 +118,18 @@ void SHH::Simulation::Map::Deinit()
     {
 	delete[] environmentList;
 	environmentList = nullptr;
+    }
+
+    if (ctrlMessageList != nullptr)
+    {
+	delete[] ctrlMessageList;
+	ctrlMessageList = nullptr;
+    }
+
+    if (simMessageList != nullptr)
+    {
+	delete[] simMessageList;
+	simMessageList = nullptr;
     }
 
     SHH::Log::Log("Simulation::Map::Deinit(): Ended successfully.");
@@ -141,6 +190,71 @@ void SHH::Simulation::Map::FlushObjects()
     objectListSize = 0;
 }
 
+bool SHH::Simulation::Map::PushControlMessage(message_ctrl* msg)
+{
+    if (ctrlMessageListSize >= CTRL_MESSAGE_LIST_SIZE)
+    {
+	SHH::Log::Warning("Simulation::Map::PushControlMessage(): No more room for messages.");
+	return false;
+    }
+    ctrlMessageList[ctrlMessageListSize++] = msg;
+    return true;
+}
+
+bool SHH::Simulation::Map::PushSimulationMessage(message_sim* msg)
+{
+    if (simMessageListSize >= SIM_MESSAGE_LIST_SIZE)
+    {
+	SHH::Log::Warning("Simulation::Map::PushSimulationMessage(): No more room for messages.");
+	return false;
+    }
+    simMessageList[simMessageListSize++] = msg;
+    return true;
+}
+
+void SHH::Simulation::Map::HandleMessages()
+{
+    for (unsigned int i = 0; i < ctrlMessageListSize; ++i)
+    {
+	message_ctrl* msg = ctrlMessageList[i];
+	if (msg->messagetype == MC_RESPAWN)
+	{
+	    object obj = SHH::Units::CreatePlayerObject(200.0f, 100.0f, 32.0f, 32.0f); //TODO: Add spawn points maybe...
+	    obj.owner = msg->sender;
+	    SHH::Simulation::Map::InsertObject(obj);
+	}
+	else if (msg->messagetype == MC_DISCONNECT)
+	{
+	}
+    }
+
+    for (unsigned int i = 0; i < simMessageListSize; ++i)
+    {
+	message_sim* msg = simMessageList[i];
+	if (msg->messagetype == MS_OBJECTUPDATE)
+	{
+	    bool objectFound = false;
+	    for (unsigned int i = 0; i < objectListSize; ++i)
+	    {
+		if (objectList[i].syncindex == msg->obj.syncindex)
+		{
+		    objectFound = true;
+		    objectList[i] = msg->obj; //TODO: Fix interpolation
+		    break;
+		}
+	    }
+	    
+	    if (!objectFound)
+	    {
+		insertUnsynchedObject(msg->obj);
+	    }
+	}
+    }
+
+    ctrlMessageListSize = 0;
+    simMessageListSize = 0;
+}
+
 bool SHH::Simulation::Map::InsertObject(object const& obj)
 {
     if (objectList == nullptr)
@@ -183,5 +297,24 @@ bool SHH::Simulation::Map::InsertEnvironment(environment const& env)
 
     environmentList[freeIndex] = env;
     ++environmentListSize;
+    return true;
+}
+
+static bool insertUnsynchedObject(object const& obj)
+{
+    if (objectList == nullptr)
+    {
+	SHH::Log::Warning("Simulation insertUnsynchedObject(): No memory allocated for objectList.");
+	return false;
+    }
+
+    if (objectListSize >= OBJECT_LIST_SIZE)
+    {
+	SHH::Log::Warning("Simulation insertUnsynchedObject(): No space left in objectList.");
+	return false;
+    }
+
+    objectList[objectListSize] = obj;
+    ++objectListSize;
     return true;
 }

@@ -32,6 +32,11 @@ bool SHH::Simulation::Behavior::Init()
 	return false;
     }
 
+    for (int i = 0; i < CONTROL_EVENT_LIST_MAXSIZE; ++i)
+    {
+	controlEventList[i] = nullptr;
+    }
+
     SHH::Log::Log("Simulation::Behavior::Init(): Ended successfully.");
     return true;
 }

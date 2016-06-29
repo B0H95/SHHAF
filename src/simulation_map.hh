@@ -22,10 +22,6 @@ namespace SHH
 	    bool PushControlMessage(message_ctrl* msg);
 	    bool PushSimulationMessage(message_sim* msg);
 	    void HandleMessages();
-
-	    //TEMP
-	    bool InsertObject(object const& obj);
-	    bool InsertEnvironment(environment const& env);
 	}
     }
 }

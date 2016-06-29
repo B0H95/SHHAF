@@ -56,7 +56,7 @@ bool SHH::Window::Init(int width, int height, std::string name)
 	SDL_DestroyWindow(window);
 	SDL_Quit();
 	return false;
-    }    
+    }
     
     windowWidth = width;
     windowHeight = height;

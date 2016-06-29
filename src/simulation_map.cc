@@ -21,9 +21,9 @@ static const unsigned int SIM_MESSAGE_LIST_SIZE = 100;
 static message_sim** simMessageList = nullptr;
 static unsigned int simMessageListSize = 0;
 
-//static bool InsertObject(object const& obj);
-//static bool InsertEnvironment(environment const& env);
-static bool insertUnsynchedObject(object const& obj);
+static bool InsertObject(object const& obj);
+static bool InsertEnvironment(environment const& env);
+static bool InsertUnsynchedObject(object const& obj);
 
 bool SHH::Simulation::Map::Init()
 {
@@ -92,6 +92,16 @@ bool SHH::Simulation::Map::Init()
     for (unsigned int i = 0; i < ENVIRONMENT_LIST_SIZE; ++i)
     {
 	SHH::Units::CreateNoneEnvironment(environmentList[i]);
+    }
+
+    for (unsigned int i = 0; i < CTRL_MESSAGE_LIST_SIZE; ++i)
+    {
+	ctrlMessageList[i] = nullptr;
+    }
+
+    for (unsigned int i = 0; i < SIM_MESSAGE_LIST_SIZE; ++i)
+    {
+	simMessageList[i] = nullptr;
     }
 
     SHH::Log::Log("Simulation::Map::Init(): Ended successfully.");
@@ -221,10 +231,11 @@ void SHH::Simulation::Map::HandleMessages()
 	{
 	    object obj = SHH::Units::CreatePlayerObject(200.0f, 100.0f, 32.0f, 32.0f); //TODO: Add spawn points maybe...
 	    obj.owner = msg->sender;
-	    SHH::Simulation::Map::InsertObject(obj);
+	    InsertObject(obj);
 	}
 	else if (msg->messagetype == MC_DISCONNECT)
 	{
+	    //TODO: Fix disconnections
 	}
     }
 
@@ -246,7 +257,7 @@ void SHH::Simulation::Map::HandleMessages()
 	    
 	    if (!objectFound)
 	    {
-		insertUnsynchedObject(msg->obj);
+		InsertUnsynchedObject(msg->obj);
 	    }
 	}
     }
@@ -255,7 +266,7 @@ void SHH::Simulation::Map::HandleMessages()
     simMessageListSize = 0;
 }
 
-bool SHH::Simulation::Map::InsertObject(object const& obj)
+bool InsertObject(object const& obj)
 {
     if (objectList == nullptr)
     {
@@ -275,7 +286,7 @@ bool SHH::Simulation::Map::InsertObject(object const& obj)
     return true;
 }
 
-bool SHH::Simulation::Map::InsertEnvironment(environment const& env)
+bool InsertEnvironment(environment const& env)
 {
     if (environmentList == nullptr)
     {
@@ -283,24 +294,18 @@ bool SHH::Simulation::Map::InsertEnvironment(environment const& env)
 	return false;
     }
 
-    unsigned int freeIndex;
-    for (freeIndex = 0; freeIndex < ENVIRONMENT_LIST_SIZE; ++freeIndex)
-    {
-	if (environmentList[freeIndex].type == ET_NONE) break;
-    }
-
-    if (freeIndex == ENVIRONMENT_LIST_SIZE)
+    if (environmentListSize >= ENVIRONMENT_LIST_SIZE)
     {
 	SHH::Log::Warning("Simulation::Map InsertEnvironment(): No space left in environmentList.");
 	return false;
     }
 
-    environmentList[freeIndex] = env;
+    environmentList[environmentListSize] = env;
     ++environmentListSize;
     return true;
 }
 
-static bool insertUnsynchedObject(object const& obj)
+static bool InsertUnsynchedObject(object const& obj)
 {
     if (objectList == nullptr)
     {

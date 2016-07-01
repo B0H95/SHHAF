@@ -3,6 +3,7 @@
 #include "simulation.hh"
 #include "simulation_behavior.hh"
 #include "simulation_map.hh"
+#include "simulation_ruleset.hh"
 
 #include "log.hh"
 #include "units.hh"
@@ -109,6 +110,10 @@ void SHH::Simulation::InputMessages::DistributeMessages()
 {
     for (unsigned int i = 0; i < ctrlMessageListSize; ++i)
     {
+	if (!SHH::Simulation::Ruleset::HandleCtrlMessage(ctrlMessageList[i]))
+	{
+	    continue;
+	}
 	if (ctrlMessageList[i].messagetype < MC_MARKER_SIM)
 	{
 	    SHH::Simulation::Behavior::PushControlMessage(&(ctrlMessageList[i]));

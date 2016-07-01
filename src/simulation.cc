@@ -4,6 +4,7 @@
 #include "simulation_physics.hh"
 #include "simulation_map.hh"
 #include "simulation_inputmessages.hh"
+#include "simulation_ruleset.hh"
 
 #include "log.hh"
 #include "programcontroller.hh"
@@ -58,6 +59,16 @@ bool SHH::Simulation::Init()
 	return false;
     }
 
+    if (!SHH::Simulation::Ruleset::Init())
+    {
+	SHH::Log::Error("Simulation::Init(): Could not init ruleset.");
+	SHH::Simulation::InputMessages::Deinit();
+	SHH::Simulation::Map::Deinit();
+	SHH::Simulation::Physics::Deinit();
+	SHH::Simulation::Behavior::Deinit();
+	return false;
+    }
+
     for (int i = 0; i < PLAYERINFO_LIST_SIZE; ++i)
     {
 	playerinfoList[i].alive = false;
@@ -78,6 +89,7 @@ void SHH::Simulation::Deinit()
 {
     SHH::Log::Log("Simulation::Deinit(): Started.");
 
+    SHH::Simulation::Ruleset::Deinit();
     SHH::Simulation::InputMessages::Deinit();
     SHH::Simulation::Map::Deinit();
     SHH::Simulation::Physics::Deinit();

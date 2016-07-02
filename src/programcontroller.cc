@@ -143,6 +143,7 @@ void SHH::ProgramController::Run()
 void SHH::ProgramController::Quit()
 {
     SHH::Log::Log("ProgramController::Quit(): Quit called.");
+    SHH::NetworkController::Disconnect();
     running = false;
 }
 

@@ -1,5 +1,8 @@
 #include "simulation_map.hh"
 
+#include "simulation.hh"
+#include "simulation_outputmessages.hh"
+
 #include "log.hh"
 
 static unsigned int newObjectIndex = 1;
@@ -24,6 +27,9 @@ static unsigned int simMessageListSize = 0;
 static bool InsertObject(object const& obj);
 static bool InsertEnvironment(environment const& env);
 static bool InsertUnsynchedObject(object const& obj);
+static void DeleteObject(unsigned int listindex);
+static void DeleteObjectBySyncindex(unsigned int syncindex);
+static void DisconnectPlayer(unsigned int ownerid);
 
 bool SHH::Simulation::Map::Init()
 {
@@ -233,9 +239,9 @@ void SHH::Simulation::Map::HandleMessages()
 	    obj.owner = msg->sender;
 	    InsertObject(obj);
 	}
-	else if (msg->messagetype == MC_DISCONNECT)
+	else if (msg->messagetype == MC_DISCONNECT && SHH::Simulation::GetMessagingMode() == MM_SERVER)
 	{
-	    //TODO: Fix disconnections
+	    DisconnectPlayer((unsigned int)msg->sender);
 	}
     }
 
@@ -259,6 +265,10 @@ void SHH::Simulation::Map::HandleMessages()
 	    {
 		InsertUnsynchedObject(msg->obj);
 	    }
+	}
+	else if (msg->messagetype == MS_DELETEOBJECT)
+	{
+	    DeleteObjectBySyncindex(msg->obj.syncindex);
 	}
     }
 
@@ -322,4 +332,43 @@ static bool InsertUnsynchedObject(object const& obj)
     objectList[objectListSize] = obj;
     ++objectListSize;
     return true;
+}
+
+static void DeleteObject(unsigned int listindex)
+{
+    if (listindex >= objectListSize || objectListSize == 0)
+    {
+	return;
+    }
+    objectListSize--;
+    objectList[listindex] = objectList[objectListSize];
+}
+
+static void DeleteObjectBySyncindex(unsigned int syncindex)
+{
+    for (unsigned int i = 0; i < objectListSize; ++i)
+    {
+	if (objectList[i].syncindex == syncindex)
+	{
+	    objectListSize--;
+	    objectList[i] = objectList[objectListSize];
+	    return;
+	}
+    }
+}
+
+static void DisconnectPlayer(unsigned int ownerid)
+{
+    for (unsigned int i = 0; i < objectListSize; ++i)
+    {
+	if (objectList[i].type == OT_PLAYER && objectList[i].owner == ownerid)
+	{
+	    message_sim msg;
+	    msg.messagetype = MS_DELETEOBJECT;
+	    msg.obj = objectList[i];
+	    SHH::Simulation::OutputMessages::PushSimMessage(msg);
+	    DeleteObject(i);
+	    return;
+	}
+    }
 }

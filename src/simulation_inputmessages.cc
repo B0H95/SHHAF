@@ -126,7 +126,7 @@ void SHH::Simulation::InputMessages::DistributeMessages()
 
     for (unsigned int i = 0; i < simMessageListSize; ++i)
     {
-	if (simMessageList[i].messagetype == MS_OBJECTUPDATE)
+	if (simMessageList[i].messagetype == MS_OBJECTUPDATE || simMessageList[i].messagetype == MS_DELETEOBJECT)
 	{
 	    SHH::Simulation::Map::PushSimulationMessage(&(simMessageList[i]));
 	}

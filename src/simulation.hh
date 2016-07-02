@@ -17,6 +17,7 @@ namespace SHH
 	int GetEnvironmentListSize();
 	bool LoadMap(std::string mapname);
 	void SetMessagingMode(messaging_mode sm);
+	messaging_mode GetMessagingMode();
 	unsigned int GetPlayerId();
 	void SetPlayerId(unsigned int pid);
     }

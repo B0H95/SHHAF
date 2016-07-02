@@ -110,7 +110,6 @@ void SHH::Simulation::Update()
     updateApplyPhysics();
     if (messagingMode == MM_SERVER)
     {
-	//sendObjectUpdates();
 	SHH::Simulation::OutputMessages::DistributeMessages();
     }
 }
@@ -143,6 +142,11 @@ bool SHH::Simulation::LoadMap(std::string mapname)
 void SHH::Simulation::SetMessagingMode(messaging_mode sm)
 {
     messagingMode = sm;
+}
+
+messaging_mode SHH::Simulation::GetMessagingMode()
+{
+    return messagingMode;
 }
 
 unsigned int SHH::Simulation::GetPlayerId()

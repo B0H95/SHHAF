@@ -10,16 +10,8 @@
 #include "programcontroller.hh"
 #include "messagehandler.hh"
 
-struct player_info
-{
-    bool alive;
-};
-
 static unsigned int playerId = 0;
 static messaging_mode messagingMode = MM_OFFLINE;
-
-static const int PLAYERINFO_LIST_SIZE = 100;
-static player_info playerinfoList [PLAYERINFO_LIST_SIZE];
 
 static void updateApplyBehaviors();
 static void updateApplyPhysics();
@@ -68,12 +60,6 @@ bool SHH::Simulation::Init()
 	SHH::Simulation::Behavior::Deinit();
 	return false;
     }
-
-    for (int i = 0; i < PLAYERINFO_LIST_SIZE; ++i)
-    {
-	playerinfoList[i].alive = false;
-    }
-    playerinfoList[0].alive = true;
 
     SHH::Log::Log("Simulation::Init(): Ended successfully.");
     return true;

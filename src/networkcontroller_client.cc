@@ -57,8 +57,18 @@ void SHH::NetworkController::Client::HandleMessages()
 	}
 	while ((received = SHH::UDP::Recv(&receivedip)) != "")
 	{
-	    smsg = SHH::Units::DeserializeSimMessage(received);
-	    SHH::MessageHandler::PushSimulationMessage(smsg);
+	    std::string header = received.substr(0, 2);
+	    received.erase(0, 2);
+	    if (header == "ns")
+	    {
+		smsg = SHH::Units::DeserializeSimMessage(received);
+		SHH::MessageHandler::PushSimulationMessage(smsg);
+	    }
+	    else if (header == "nc")
+	    {
+		cmsg = SHH::Units::DeserializeCtrlMessage(received);
+		SHH::MessageHandler::PushIncomingControlMessage(cmsg);
+	    }
 	}
     }
 }

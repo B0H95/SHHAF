@@ -89,7 +89,7 @@ void SHH::NetworkController::Server::HandleMessages()
 	std::string serializedMessage = SHH::Units::SerializeSimMessage(smsg);
 	for (int i = 0; i < numclients; ++i)
 	{
-	    SHH::UDP::Send(serializedMessage, clients[i].ip);
+	    SHH::UDP::Send("ns" + serializedMessage, clients[i].ip);
 	}
     }
     while ((received = SHH::UDP::Recv(&receivedip)) != "")
@@ -197,7 +197,7 @@ static void SendPlayerIdentificationMessage(ipaddr const& ip, unsigned int id)
     message_sim playerIdMessage;
     playerIdMessage.messagetype = MS_PLAYERIDENTIFICATION;
     playerIdMessage.obj.owner = id;
-    SHH::UDP::Send(SHH::Units::SerializeSimMessage(playerIdMessage), ip);   
+    SHH::UDP::Send("ns" + SHH::Units::SerializeSimMessage(playerIdMessage), ip);   
 }
 
 static void CheckForClientInactivity()
@@ -207,6 +207,13 @@ static void CheckForClientInactivity()
     {
 	if (std::chrono::duration_cast<std::chrono::duration<double>>(now - clients[i].lastupdate).count() >= MAX_INACTIVITY_TIME)
 	{
+	    message_ctrl cmsg;
+	    SHH::Units::CreateNoneControlMessage(cmsg);
+	    cmsg.messagetype = MC_DISCONNECT;
+	    cmsg.sender = clients[i].id;
+	    std::string serializedMessage = SHH::Units::SerializeCtrlMessage(cmsg);	    
+	    SHH::UDP::Send("nc" + serializedMessage, clients[i].ip);
+
 	    message_ctrl dcmsg;
 	    SHH::Units::CreateNoneControlMessage(dcmsg);
 	    dcmsg.messagetype = MC_DISCONNECT;

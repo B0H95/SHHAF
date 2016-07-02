@@ -3,6 +3,8 @@
 #include "simulation.hh"
 #include "simulation_outputmessages.hh"
 
+#include "messagehandler.hh"
+#include "networkcontroller.hh"
 #include "log.hh"
 
 static unsigned int newObjectIndex = 1;
@@ -239,9 +241,21 @@ void SHH::Simulation::Map::HandleMessages()
 	    obj.owner = msg->sender;
 	    InsertObject(obj);
 	}
-	else if (msg->messagetype == MC_DISCONNECT && SHH::Simulation::GetMessagingMode() == MM_SERVER)
+	else if (msg->messagetype == MC_DISCONNECT)
 	{
-	    DisconnectPlayer((unsigned int)msg->sender);
+	    if (SHH::Simulation::GetMessagingMode() == MM_SERVER)
+	    {
+		DisconnectPlayer((unsigned int)msg->sender);
+	    }
+	    else if (SHH::Simulation::GetMessagingMode() == MM_CLIENT)
+	    {
+		SHH::MessageHandler::SetMessagingMode(MM_OFFLINE);
+		SHH::Simulation::SetMessagingMode(MM_OFFLINE);
+		SHH::NetworkController::SetMessagingMode(MM_OFFLINE);
+		SHH::Simulation::Map::FlushObjects();
+		SHH::Simulation::Map::FlushEnvironments();
+		SHH::Log::Log("Simulation::Map::HandleMessages(): Disconnected.");
+	    }
 	}
     }
 

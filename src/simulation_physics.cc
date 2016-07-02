@@ -1,7 +1,10 @@
 #include "simulation_physics.hh"
 
+#include "simulation_outputmessages.hh"
+
 #include "log.hh"
 #include "programcontroller.hh"
+#include "units.hh"
 
 static const float GRAVITY = 300.0f;
 
@@ -9,6 +12,7 @@ static odirection checkObjectEnvironmentCollision(object const& obj, environment
 static void handleBehaviorRequest(object& obj, object& request);
 static void updatePosition(object& obj, float ftime);
 static void handleEnvironmentCollisions(object& obj, environment* elist, int elistsize);
+static void handleMessageDistribution(object const& obj);
 
 bool SHH::Simulation::Physics::Init()
 {
@@ -30,7 +34,8 @@ void SHH::Simulation::Physics::ApplyPhysics(object* olist, object* obrlist, int 
     {
 	handleBehaviorRequest(olist[i], obrlist[i]);
 	updatePosition(olist[i], frameTime);
-	handleEnvironmentCollisions(olist[i], elist, elistsize);	
+	handleEnvironmentCollisions(olist[i], elist, elistsize);
+	handleMessageDistribution(olist[i]);
     }
 }
 
@@ -141,4 +146,12 @@ static void handleEnvironmentCollisions(object& obj, environment* elist, int eli
     {
 	obj.state = OS_FALLING;
     }
+}
+
+static void handleMessageDistribution(object const& obj)
+{
+    message_sim msg;
+    msg.messagetype = MS_OBJECTUPDATE;
+    msg.obj = obj;
+    SHH::Simulation::OutputMessages::PushSimMessage(msg);
 }

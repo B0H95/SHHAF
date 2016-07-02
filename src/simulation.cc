@@ -5,6 +5,7 @@
 #include "simulation_map.hh"
 #include "simulation_inputmessages.hh"
 #include "simulation_ruleset.hh"
+#include "simulation_outputmessages.hh"
 
 #include "log.hh"
 #include "programcontroller.hh"
@@ -15,7 +16,6 @@ static messaging_mode messagingMode = MM_OFFLINE;
 
 static void updateApplyBehaviors();
 static void updateApplyPhysics();
-static void sendObjectUpdates();
 
 bool SHH::Simulation::Init()
 {
@@ -61,6 +61,17 @@ bool SHH::Simulation::Init()
 	return false;
     }
 
+    if (!SHH::Simulation::OutputMessages::Init())
+    {
+	SHH::Log::Error("Simulation::Init(): Could not init outputmessages.");
+	SHH::Simulation::Ruleset::Deinit();
+	SHH::Simulation::InputMessages::Deinit();
+	SHH::Simulation::Map::Deinit();
+	SHH::Simulation::Physics::Deinit();
+	SHH::Simulation::Behavior::Deinit();
+	return false;
+    }
+
     SHH::Log::Log("Simulation::Init(): Ended successfully.");
     return true;
 }
@@ -75,6 +86,7 @@ void SHH::Simulation::Deinit()
 {
     SHH::Log::Log("Simulation::Deinit(): Started.");
 
+    SHH::Simulation::OutputMessages::Deinit();
     SHH::Simulation::Ruleset::Deinit();
     SHH::Simulation::InputMessages::Deinit();
     SHH::Simulation::Map::Deinit();
@@ -98,7 +110,8 @@ void SHH::Simulation::Update()
     updateApplyPhysics();
     if (messagingMode == MM_SERVER)
     {
-	sendObjectUpdates();
+	//sendObjectUpdates();
+	SHH::Simulation::OutputMessages::DistributeMessages();
     }
 }
 
@@ -158,17 +171,4 @@ static void updateApplyPhysics()
     environment* environmentList = SHH::Simulation::Map::GetEnvironmentList();
     int environmentListSize = (int)SHH::Simulation::Map::GetEnvironmentListSize();
     SHH::Simulation::Physics::ApplyPhysics(objectList, objectBehaviorRequests, objectListSize, environmentList, environmentListSize);
-}
-
-static void sendObjectUpdates()
-{
-    object* objectList = SHH::Simulation::Map::GetObjectList();
-    int objectListSize = (int)SHH::Simulation::Map::GetObjectListSize();
-    message_sim msg;
-    msg.messagetype = MS_OBJECTUPDATE;
-    for (int i = 0; i < objectListSize; ++i)
-    {
-	msg.obj = objectList[i];
-	SHH::MessageHandler::PushSimulationMessage(msg);
-    }
 }

@@ -66,6 +66,11 @@ bool SHH::Simulation::Ruleset::HandleCtrlMessage(message_ctrl const& msg)
     return true;
 }
 
+void SHH::Simulation::Ruleset::HandleSimMessage(message_sim const& msg)
+{
+    //TODO: Something...
+}
+
 static int UserId(int id)
 {
     for (unsigned int i = 0; i < userdataListSize; ++i)

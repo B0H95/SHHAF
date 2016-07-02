@@ -6,12 +6,12 @@ namespace SHH
 {
     namespace Simulation
     {
-	namespace Ruleset
+	namespace OutputMessages
 	{
 	    bool Init();
 	    void Deinit();
-	    bool HandleCtrlMessage(message_ctrl const& msg);
-	    void HandleSimMessage(message_sim const& msg);
+	    bool PushSimMessage(message_sim const& msg);
+	    void DistributeMessages();
 	}
     }
 }

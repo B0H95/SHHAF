@@ -7,6 +7,12 @@
 
 bool SHH::UI::Components::Console::Init()
 {
+    if (!SHH::Window::LoadFont("res/fonts/default.ttf", 24))
+    {
+	SHH::Log::Error("UI::Components::Console::Init(): Could not load font.");
+	return false;
+    }
+    
     visible = false;
     input = "";
     scroll = 0;

@@ -68,7 +68,9 @@ bool SHH::Simulation::Ruleset::HandleCtrlMessage(message_ctrl const& msg)
 
 void SHH::Simulation::Ruleset::HandleSimMessage(message_sim const& msg)
 {
-    //TODO: Something...
+    message_sim m = msg;  //TODO: Handle messages if appropriate
+    m.messagetype = MS_NOTHING;
+    m.obj.x += 343434;  //Just to avoid compiler warnings
 }
 
 static int UserId(int id)

@@ -1,6 +1,6 @@
 CCC = g++
 CCFLAGS = -std=c++11 -pthread -Wall -Wextra
-LIBS = -lSDL2 -lSDL2_net -lSDL2_ttf
+LIBS = -lSDL2 -lSDL2_net -lSDL2_ttf -lSDL2_image
 FILES = src/*.cc
 NAME = hobo
 

@@ -33,6 +33,7 @@ bool SHH::UI::Init()
 	return false;
     }
 
+
     SHH::Log::Log("UI::Init(): Ended successfully.");
     return true;
 }

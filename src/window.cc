@@ -5,7 +5,6 @@
 #include "window_resources_texture.hh"
 
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
 #include "programcontroller.hh"
 #include "log.hh"
 
@@ -34,18 +33,10 @@ bool SHH::Window::Init(int width, int height, std::string name)
 	return false;
     }
 
-    if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG))
-    {
-	SHH::Log::Error("Window::Init(): IMG_Init failed.");
-	SDL_Quit();
-	return false;
-    }
-
     window = SDL_CreateWindow(name.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN);
     if (window == nullptr)
     {
 	SHH::Log::Error("Window::Init(): SDL_CreateWindow failed.");
-	IMG_Quit();
 	SDL_Quit();
 	return false;
     }
@@ -55,7 +46,6 @@ bool SHH::Window::Init(int width, int height, std::string name)
     {
 	SHH::Log::Error("Window::Init(): SDL_CreateRenderer failed.");
 	SDL_DestroyWindow(window);
-	IMG_Quit();
 	SDL_Quit();
 	return false;
     }
@@ -65,7 +55,6 @@ bool SHH::Window::Init(int width, int height, std::string name)
 	SHH::Log::Error("Window::Init(): Could not init resources.");
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
-	IMG_Quit();
 	SDL_Quit();
 	return false;
     }
@@ -99,7 +88,6 @@ void SHH::Window::Deinit()
 	SDL_DestroyWindow(window);
     }
 
-    IMG_Quit();
     SDL_Quit();
 
     SHH::Log::Log("Window::Deinit(): Ended successfully.");
@@ -221,14 +209,19 @@ void SHH::Window::DrawPoint(int x, int y)
     SDL_RenderDrawPoint(renderer, x, y);
 }
 
-void SHH::Window::DrawText(std::string text, int x, int y)
+void SHH::Window::DrawText(std::string fontname, std::string text, int x, int y)
 {
     if (x > windowWidth || y > windowHeight || text.length() <= 0)
     {
 	return;
     }
 
-    SHH::Window::Resources::Font* font = SHH::Window::Resources::GetCurrentFont();
+    SHH::Window::Resources::Font* font = SHH::Window::Resources::GetFont(fontname);
+    if (font == nullptr)
+    {
+	return;
+    }
+    
     int charWidth = font->GetCharWidth();
     SDL_Texture* charmap = font->GetCharMap();
     SDL_Rect rect = {0, y, fontCharDrawWidth, fontCharDrawHeight};
@@ -254,6 +247,11 @@ void SHH::Window::DrawTexture(std::string name, int x, int y, int w, int h)
 {
     SDL_Rect rect = {x, y, w, h};
     SHH::Window::Resources::Texture* tx = SHH::Window::Resources::GetTexture(name);
+    if (tx == nullptr)
+    {
+	return;
+    }
+    
     SDL_Texture* sdltx = tx->GetTexture();
     SDL_RenderCopy(renderer, sdltx, nullptr, &rect);
 }

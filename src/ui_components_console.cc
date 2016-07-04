@@ -78,11 +78,11 @@ void SHH::UI::Components::Console::Draw()
 
     for (int i = 0; i < amountOfLines; ++i)
     {
-	SHH::Window::DrawText(SHH::Log::GetLogEntry(amountOfLines - i - 1 + scroll), 0, i * fontHeight);
+	SHH::Window::DrawText("res/fonts/default.ttf", SHH::Log::GetLogEntry(amountOfLines - i - 1 + scroll), 0, i * fontHeight);
     }
 
     std::string inputLine = "> " + input + " <";
-    SHH::Window::DrawText(inputLine, 0, amountOfLines * fontHeight);
+    SHH::Window::DrawText("res/fonts/default.ttf", inputLine, 0, amountOfLines * fontHeight);
 }
 
 bool SHH::UI::Components::Console::Visible()

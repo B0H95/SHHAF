@@ -26,7 +26,7 @@ namespace SHH
 	void DrawFilledRectangle(int x1, int y1, int x2, int y2);
 	void DrawLine(int x1, int y1, int x2, int y2);
 	void DrawPoint(int x, int y);
-	void DrawText(std::string text, int x, int y);
+	void DrawText(std::string fontname, std::string text, int x, int y);
 	void DrawTexture(std::string name, int x, int y, int w, int h);
     }
 }

@@ -33,6 +33,11 @@ bool SHH::UI::Init()
 	return false;
     }
 
+    if (!SHH::Window::LoadTexture("res/textures/example1.png"))
+    {
+	SHH::Log::Error("UI:Init(): Could not load default texture.");
+	return false;
+    }
 
     SHH::Log::Log("UI::Init(): Ended successfully.");
     return true;
@@ -53,7 +58,7 @@ void SHH::UI::Draw()
     drawFrameLoadBar();
     
     console.Draw();
-
+    
     SHH::Window::UpdateScreen();
 }
 
@@ -161,7 +166,9 @@ static void drawSimulation()
 	    {
 		if (objectList[i].owner == playerId)
 		{
-		    SHH::Window::SetColor(0x00, 0xFF, 0x00, 0xFF);
+		    //SHH::Window::SetColor(0x00, 0xFF, 0x00, 0xFF);
+		    SHH::Window::DrawTexture("res/textures/example1.png", x1, y1, x2-x1, y2-y1);
+		    continue;
 		}
 		else
 		{

@@ -16,7 +16,7 @@ namespace SHH
 	    void Deinit();
 	    bool LoadFont(std::string name, int height);
 	    bool LoadTexture(std::string name);
-	    SHH::Window::Resources::Font* GetCurrentFont();
+	    SHH::Window::Resources::Font* GetFont(std::string name);
 	    SHH::Window::Resources::Texture* GetTexture(std::string name);
 	}
     }

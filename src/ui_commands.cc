@@ -49,6 +49,29 @@ bool SHH::UI::Commands::Map(std::string mapname) //TODO: Go to offline mode prop
     return true;
 }
 
+void SHH::UI::Commands::GetMessagingMode()
+{
+    messaging_mode mmode = SHH::Simulation::GetMessagingMode();
+    switch (mmode)
+    {
+    case MM_OFFLINE:
+	SHH::Log::Log("Messaging mode: Offline");
+	break;
+    case MM_CLIENT:
+	SHH::Log::Log("Messaging mode: Client");
+	break;
+    case MM_SERVER:
+	SHH::Log::Log("Messaging mode: Server");
+	break;
+    default:
+	break;
+    }
+    if (mmode != SHH::MessageHandler::GetMessagingMode() || mmode != SHH::NetworkController::GetMessagingMode())
+    {
+	SHH::Log::Log("Messaging mode is inconsistent!");
+    }
+}
+
 static void SetGlobalMessagingMode(messaging_mode mmode)
 {
     SHH::MessageHandler::SetMessagingMode(mmode);

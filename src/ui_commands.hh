@@ -14,6 +14,7 @@ namespace SHH
 	    bool Connect(std::string serverip, uint32_t serverport);
 	    bool Disconnect();
 	    bool Map(std::string mapname);
+	    void GetMessagingMode();
 	}
     }
 }

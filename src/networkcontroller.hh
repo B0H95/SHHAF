@@ -16,5 +16,6 @@ namespace SHH
 	bool ConnectToServer(std::string destination, uint32_t portnumber);
 	void Disconnect();
 	void SetMessagingMode(messaging_mode mmode);
+	messaging_mode GetMessagingMode();
     }
 }

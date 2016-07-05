@@ -28,12 +28,22 @@ bool SHH::UI::Components::Main::Init()
 	console.Deinit();
 	return false;
     }
+
+    if (!gameInput.Init())
+    {
+	SHH::Log::Error("UI::Components::Main::Init(): Could not init gameInput.");
+	performanceMonitor.Deinit();
+	simulationRenderer.Deinit();
+	console.Deinit();
+	return false;
+    }
     
     return true;
 }
 
 void SHH::UI::Components::Main::Deinit()
 {
+    gameInput.Deinit();
     performanceMonitor.Deinit();
     simulationRenderer.Deinit();
     console.Deinit();
@@ -41,34 +51,10 @@ void SHH::UI::Components::Main::Deinit()
 
 void SHH::UI::Components::Main::ProcessInputs()
 {
-    message_ctrl msg;
-    msg.sender = SHH::Simulation::GetPlayerId();
-    msg.strsize = 0;
-    msg.str = "";
-
-    if (SHH::Window::IsKeyDown("left"))
+    if (!console.Visible())
     {
-	msg.messagetype = MC_RUNLEFT;
-	SHH::MessageHandler::PushControlMessage(msg);
+	gameInput.ProcessInputs();
     }
-    if (SHH::Window::IsKeyDown("right"))
-    {
-	msg.messagetype = MC_RUNRIGHT;
-	SHH::MessageHandler::PushControlMessage(msg);
-    }
-    if (SHH::Window::IsKeyDown("up"))
-    {
-	msg.messagetype = MC_JUMP;
-	SHH::MessageHandler::PushControlMessage(msg);
-    }
-    if (SHH::Window::IsKeyPressed("r") && !console.Visible())
-    {
-	message_ctrl msg;
-	SHH::Units::CreateNoneControlMessage(msg);
-	msg.messagetype = MC_RESPAWN;
-	SHH::MessageHandler::PushControlMessage(msg);
-    }
-
     console.ProcessInputs();
     simulationRenderer.ProcessInputs();
     performanceMonitor.ProcessInputs();
@@ -76,6 +62,7 @@ void SHH::UI::Components::Main::ProcessInputs()
 
 void SHH::UI::Components::Main::Draw()
 {
+    gameInput.Draw();
     simulationRenderer.Draw();
     console.Draw();
     performanceMonitor.Draw();

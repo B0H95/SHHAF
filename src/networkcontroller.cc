@@ -153,6 +153,11 @@ void SHH::NetworkController::SetMessagingMode(messaging_mode mmode)
     }
 }
 
+messaging_mode SHH::NetworkController::GetMessagingMode()
+{
+    return messagingmode;
+}
+
 static void networkThreadMain()
 {
     SHH::Log::Log("networkThreadMain(): Started.");

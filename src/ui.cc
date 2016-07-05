@@ -89,4 +89,8 @@ void SHH::UI::SendMessage(std::string msg)
     {
 	SHH::UI::Commands::Disconnect();
     }
+    else if (cmd == "MMODE")
+    {
+	SHH::UI::Commands::GetMessagingMode();
+    }
 }

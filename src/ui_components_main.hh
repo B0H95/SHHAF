@@ -4,6 +4,7 @@
 #include "ui_components_simulationrenderer.hh"
 #include "ui_components_performancemonitor.hh"
 #include "ui_components_gameinput.hh"
+#include "ui_components_menuoverlay.hh"
 
 namespace SHH
 {
@@ -24,6 +25,7 @@ namespace SHH
 		SHH::UI::Components::SimulationRenderer simulationRenderer;
 		SHH::UI::Components::PerformanceMonitor performanceMonitor;
 		SHH::UI::Components::GameInput gameInput;
+		SHH::UI::Components::MenuOverlay menuOverlay;
 	    };
 	}
     }

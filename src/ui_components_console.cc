@@ -79,6 +79,11 @@ void SHH::UI::Components::Console::Draw()
     const int fontHeight = 16;
     const int amountOfLines = (SHH::Window::GetWindowHeight() / (fontHeight * 2)) - 2;
 
+    SHH::Window::SetColor(0x10, 0x10, 0x10, 0xFF);
+    SHH::Window::DrawFilledRectangle(0, 0, SHH::Window::GetWindowWidth(), fontHeight * amountOfLines);
+    SHH::Window::SetColor(0x20, 0x20, 0x20, 0xFF);
+    SHH::Window::DrawFilledRectangle(0, fontHeight * amountOfLines, SHH::Window::GetWindowWidth(), fontHeight * (amountOfLines + 1));
+
     SHH::Window::SetFontCharSize(9, fontHeight);
     SHH::Window::SetColor(0xFF, 0xFF, 0xFF, 0xFF);
 

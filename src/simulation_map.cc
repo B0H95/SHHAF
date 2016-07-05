@@ -180,9 +180,13 @@ unsigned int SHH::Simulation::Map::GetEnvironmentListSize()
 
 bool SHH::Simulation::Map::LoadMap(std::string mapname)
 {
-    SHH::Log::Warning("Simulation::Map::LoadMap(\"" + mapname + "\"): To be implemented, loading default instead.");
     SHH::Simulation::Map::FlushEnvironments();
     SHH::Simulation::Map::FlushObjects();
+    if (mapname == "menu")
+    {
+	return true;
+    }
+    SHH::Log::Warning("Simulation::Map::LoadMap(\"" + mapname + "\"): To be implemented, loading default instead.");
     InsertEnvironment(SHH::Units::CreateSolidEnvironment(50.0f,500.0f,700.0f,50.0f));
     InsertEnvironment(SHH::Units::CreateSolidEnvironment(50.0f,450.0f,150.0f,50.0f));
     InsertEnvironment(SHH::Units::CreateSolidEnvironment(400.0f,490.0f,300.0f,10.0f));

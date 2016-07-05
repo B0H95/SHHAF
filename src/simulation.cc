@@ -78,7 +78,7 @@ bool SHH::Simulation::Init()
 
 bool SHH::Simulation::Postinit()
 {
-    SHH::Simulation::LoadMap("de_dust2");
+    SHH::Simulation::LoadMap("menu");
     return true;
 }
 

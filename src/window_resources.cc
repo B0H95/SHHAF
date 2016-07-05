@@ -48,6 +48,11 @@ void SHH::Window::Resources::Deinit()
 
 bool SHH::Window::Resources::LoadFont(std::string name, int height)
 {
+    if (fontList.find(name) != fontList.end())
+    {
+	SHH::Log::Log("Window::Resources::LoadFont(): Font \"" + name + "\" already loaded.");
+	return true;
+    }
     fontList[name].SetRenderer(renderer);
     if (!(fontList[name].Load(name, height)))
     {
@@ -60,6 +65,11 @@ bool SHH::Window::Resources::LoadFont(std::string name, int height)
 
 bool SHH::Window::Resources::LoadTexture(std::string name)
 {
+    if (textureList.find(name) != textureList.end())
+    {
+	SHH::Log::Log("Window::Resources::LoadTexture(): Texture \"" + name + "\" already loaded.");
+	return true;
+    }
     textureList[name].SetRenderer(renderer);
     if (!(textureList[name].Load(name)))
     {

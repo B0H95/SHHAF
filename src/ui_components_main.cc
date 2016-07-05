@@ -37,12 +37,23 @@ bool SHH::UI::Components::Main::Init()
 	console.Deinit();
 	return false;
     }
+
+    if (!menuOverlay.Init())
+    {
+	SHH::Log::Error("UI::Components::Main::Init(): Could not init menuOverlay.");
+	gameInput.Deinit();
+	performanceMonitor.Deinit();
+	simulationRenderer.Deinit();
+	console.Deinit();
+	return false;
+    }
     
     return true;
 }
 
 void SHH::UI::Components::Main::Deinit()
 {
+    menuOverlay.Deinit();
     gameInput.Deinit();
     performanceMonitor.Deinit();
     simulationRenderer.Deinit();
@@ -53,7 +64,11 @@ void SHH::UI::Components::Main::ProcessInputs()
 {
     if (!console.Visible())
     {
-	gameInput.ProcessInputs();
+	if (!menuOverlay.Visible())
+	{
+	    gameInput.ProcessInputs();
+	}
+	menuOverlay.ProcessInputs();
     }
     console.ProcessInputs();
     simulationRenderer.ProcessInputs();
@@ -64,6 +79,7 @@ void SHH::UI::Components::Main::Draw()
 {
     gameInput.Draw();
     simulationRenderer.Draw();
+    menuOverlay.Draw();
     console.Draw();
     performanceMonitor.Draw();
 }

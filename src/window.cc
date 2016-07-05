@@ -58,7 +58,8 @@ bool SHH::Window::Init(int width, int height, std::string name)
 	SDL_Quit();
 	return false;
     }
-    
+
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     windowWidth = width;
     windowHeight = height;
 
@@ -96,6 +97,10 @@ void SHH::Window::Deinit()
 void SHH::Window::ProcessEvents()
 {
     currentKey = 0;
+    for (int i = 0; i < SDL_NUM_SCANCODES; ++i)
+    {
+	previousKeystates[i] = keystate[i];
+    }
     while (SDL_PollEvent(&event) != 0)
     {
 	if (event.type == SDL_QUIT)

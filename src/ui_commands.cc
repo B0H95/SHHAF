@@ -37,7 +37,7 @@ bool SHH::UI::Commands::Disconnect()
 {
     SHH::NetworkController::Disconnect();
     SetGlobalMessagingMode(MM_OFFLINE);
-    SHH::Simulation::LoadMap("default");
+    SHH::Simulation::LoadMap("menu");
     SHH::Simulation::SetPlayerId(0);
     return true;
 }

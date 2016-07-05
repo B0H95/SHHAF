@@ -29,7 +29,11 @@ bool SHH::UI::Commands::Connect(std::string serverip, uint32_t serverport)
 {
     SHH::Simulation::Map::FlushObjects(); //TODO: Fix something in Simulation instead
     SetGlobalMessagingMode(MM_CLIENT);
-    SHH::NetworkController::ConnectToServer(serverip, serverport);
+    if (!SHH::NetworkController::ConnectToServer(serverip, serverport))
+    {
+	SetGlobalMessagingMode(MM_OFFLINE);
+	SHH::Simulation::LoadMap("menu");
+    }
     return true;
 }
 
@@ -42,9 +46,14 @@ bool SHH::UI::Commands::Disconnect()
     return true;
 }
 
-bool SHH::UI::Commands::Map(std::string mapname) //TODO: Go to offline mode properly
+bool SHH::UI::Commands::Map(std::string mapname)
 {
+    if (SHH::Simulation::GetMessagingMode() == MM_CLIENT)
+    {
+	SHH::NetworkController::Disconnect();
+    }
     SetGlobalMessagingMode(MM_OFFLINE);
+    SHH::Simulation::SetPlayerId(0);
     SHH::Simulation::LoadMap(mapname);
     return true;
 }

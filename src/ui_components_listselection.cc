@@ -5,9 +5,9 @@
 
 bool SHH::UI::Components::ListSelection::Init()
 {
-    if (!SHH::Window::LoadFont("res/fonts/default.ttf", 24))
+    if (!textdrawer.Init())
     {
-	SHH::Log::Error("UI::Components::ListSelection::Init(): Could not load font.");
+	SHH::Log::Error("UI::Components::ListSelection::Init(): Could not init textdrawer.");
 	return false;
     }
 
@@ -23,6 +23,7 @@ bool SHH::UI::Components::ListSelection::Init()
 
 void SHH::UI::Components::ListSelection::Deinit()
 {
+    textdrawer.Deinit();
     ClearList();
 }
 
@@ -47,22 +48,16 @@ void SHH::UI::Components::ListSelection::ProcessInputs()
 
 void SHH::UI::Components::ListSelection::Draw()
 {
-    SHH::Window::SetColor(0xFF, 0xFF, 0xFF, 0xFF);
-    SHH::Window::SetFontCharSize(fontw, fonth);
-
-    int xmargin = fontw / 3;
-    int ymargin = fonth / 3;
-    int height = fonth + (ymargin * 2);
-
     for (unsigned int i = 0; i < listsize; ++i)
     {
+	textdrawer.Highlight(false);
 	if (focus && i == selection)
 	{
-	    SHH::Window::SetColor(0x7F, 0xFF, 0x7F, 0x0F);
-	    SHH::Window::DrawFilledRectangle(x, y + (height * i), x + (xmargin * 2) + (menuItems[i].length() * fontw), y + height + (height * i));
-	    SHH::Window::SetColor(0xFF, 0xFF, 0xFF, 0xFF);
+	    textdrawer.Highlight(true);
 	}
-	SHH::Window::DrawText("res/fonts/default.ttf", menuItems[i], x + xmargin, y + ymargin + (height * i));
+	textdrawer.SetText(menuItems[i]);
+	textdrawer.SetPosition(x, y + (fonth * i * 1.5));
+	textdrawer.Draw();
     }    
 }
 
@@ -96,6 +91,7 @@ void SHH::UI::Components::ListSelection::SetPosition(int nx, int ny)
 
 void SHH::UI::Components::ListSelection::SetFontSize(int w, int h)
 {
+    textdrawer.SetFontCharSize(w, h);
     fontw = w;
     fonth = h;
 }

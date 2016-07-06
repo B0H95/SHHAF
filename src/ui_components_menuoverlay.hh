@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ui_components_listselection.hh"
+#include "ui_components_text.hh"
 
 namespace SHH
 {
@@ -20,6 +21,7 @@ namespace SHH
 	    private:
 		bool visible;
 		SHH::UI::Components::ListSelection menulist;
+		SHH::UI::Components::Text titletext;
 	    };
 	}
     }

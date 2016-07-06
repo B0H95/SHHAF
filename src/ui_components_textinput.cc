@@ -6,16 +6,14 @@
 
 bool SHH::UI::Components::TextInput::Init()
 {
-    if (!SHH::Window::LoadFont("res/fonts/default.ttf", 24))
+    if (!textdrawer.Init())
     {
-	SHH::Log::Error("UI::Components::TextInput::Init(): Could not load font.");
+	SHH::Log::Error("UI::Components::TextInput::Init(): Could not init textdrawer.");
 	return false;
     }
 
     flashtimer = 0;
     framerate = SHH::ProgramController::GetFrameRate();
-    x = 0;
-    y = 0;
     focus = false;
     inputstr = "";
     onenter = nullptr;
@@ -25,6 +23,7 @@ bool SHH::UI::Components::TextInput::Init()
 
 void SHH::UI::Components::TextInput::Deinit()
 {
+    textdrawer.Deinit();
 }
 
 void SHH::UI::Components::TextInput::ProcessInputs()
@@ -59,13 +58,19 @@ void SHH::UI::Components::TextInput::ProcessInputs()
 void SHH::UI::Components::TextInput::Draw()
 {
     flashtimer = (flashtimer + 1) % framerate;
-    SHH::Window::SetColor(0xFF, 0xFF, 0xFF, 0xFF);
+    /*SHH::Window::SetColor(0xFF, 0xFF, 0xFF, 0xFF);
     SHH::Window::SetFontCharSize(14, 24);
-    SHH::Window::DrawText("res/fonts/default.ttf", inputstr, x, y);
+    SHH::Window::DrawText("res/fonts/default.ttf", inputstr, x, y);*/
     if (focus && flashtimer >= framerate / 2)
     {
-	SHH::Window::DrawText("res/fonts/default.ttf", "_", x + (inputstr.length() * 14), y);
+	textdrawer.SetText(inputstr + "_");
+	//SHH::Window::DrawText("res/fonts/default.ttf", "_", x + (inputstr.length() * 14), y);
     }
+    else
+    {
+	textdrawer.SetText(inputstr);
+    }
+    textdrawer.Draw();
 }
 
 void SHH::UI::Components::TextInput::SetFocus(bool f)
@@ -75,8 +80,12 @@ void SHH::UI::Components::TextInput::SetFocus(bool f)
 
 void SHH::UI::Components::TextInput::SetPosition(int nx, int ny)
 {
-    x = nx;
-    y = ny;
+    textdrawer.SetPosition(nx, ny);
+}
+
+std::string SHH::UI::Components::TextInput::GetString()
+{
+    return inputstr;
 }
 
 void SHH::UI::Components::TextInput::OnEnterPressed(void(*callback)(void* data), void* userdata)

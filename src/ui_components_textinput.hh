@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ui_components_text.hh"
+
 #include <string>
 
 namespace SHH
@@ -17,13 +19,13 @@ namespace SHH
 		void Draw();
 		void SetFocus(bool f);
 		void SetPosition(int nx, int ny);
+		std::string GetString();
 		void OnEnterPressed(void(*callback)(void* data), void* userdata);
 
 	    private:
 		int flashtimer;
 		int framerate;
-		int x;
-		int y;
+		SHH::UI::Components::Text textdrawer;
 		bool focus;
 		std::string inputstr;
 		void (*onenter) (void*);

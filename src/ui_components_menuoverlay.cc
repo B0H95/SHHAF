@@ -6,14 +6,15 @@
 #include "window.hh"
 #include "programcontroller.hh"
 
-static void StartPressed(void* data);
+static void JoinPressed(void* data);
+static void HostPressed(void* data);
 static void QuitPressed(void* data);
 
 bool SHH::UI::Components::MenuOverlay::Init()
 {
-    if (!SHH::Window::LoadFont("res/fonts/default.ttf", 24))
+    if (!titletext.Init())
     {
-	SHH::Log::Error("UI::Components::MenuOverlay::Init(): Could not load font.");
+	SHH::Log::Error("UI::Components::MenuOverlay::Init(): Could not init titletext.");
 	return false;
     }
 
@@ -23,10 +24,15 @@ bool SHH::UI::Components::MenuOverlay::Init()
 	return false;
     }
 
-    menulist.AddMenuOption("Start game", StartPressed, (void*)&visible);
+    menulist.AddMenuOption("Join game", JoinPressed, (void*)&visible);
+    menulist.AddMenuOption("Host game", HostPressed, nullptr);
     menulist.AddMenuOption("Quit", QuitPressed, nullptr);
     menulist.SetPosition(40, 200);
     menulist.SetFocus(true);
+
+    titletext.SetPosition(20, 100);
+    titletext.SetFontCharSize(14, 24);
+    titletext.SetText("\"Practice, practice, practice, ...\", Fatal1ty");
     
     visible = true;
     return true;
@@ -34,6 +40,7 @@ bool SHH::UI::Components::MenuOverlay::Init()
 
 void SHH::UI::Components::MenuOverlay::Deinit()
 {
+    titletext.Deinit();
     menulist.Deinit();
 }
 
@@ -55,9 +62,7 @@ void SHH::UI::Components::MenuOverlay::Draw()
 	int screenheight = SHH::Window::GetWindowHeight();
 	SHH::Window::SetColor(0x00, 0x00, 0x00, 0xC0);
 	SHH::Window::DrawFilledRectangle(0, 0, screenwidth, screenheight);
-	SHH::Window::SetColor(0xFF, 0xFF, 0xFF, 0xFF);
-	SHH::Window::SetFontCharSize(14, 24);
-	SHH::Window::DrawText("res/fonts/default.ttf", "\"Practice, practice, practice, ...\", Fatal1ty", 20, 100);
+	titletext.Draw();
 	menulist.Draw();
     }
 }
@@ -67,10 +72,16 @@ bool SHH::UI::Components::MenuOverlay::Visible()
     return visible;
 }
 
-static void StartPressed(void* data)
+static void JoinPressed(void* data)
 {
     SHH::UI::Commands::Map("de_dust2");
     *((bool*)data) = false;
+}
+
+static void HostPressed(void* data)
+{
+    (void)data;
+    SHH::Log::Log("HostPressed");
 }
 
 static void QuitPressed(void* data)

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ui_components_text.hh"
+
 #include <string>
 #include <vector>
 
@@ -23,6 +25,7 @@ namespace SHH
 		void SetFontSize(int w, int h);
 
 	    private:
+		SHH::UI::Components::Text textdrawer;
 		int x;
 		int y;
 		int fontw;

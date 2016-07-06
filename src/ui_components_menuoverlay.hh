@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ui_components_listselection.hh"
+
 namespace SHH
 {
     namespace UI
@@ -17,7 +19,7 @@ namespace SHH
 
 	    private:
 		bool visible;
-		unsigned int selection;
+		SHH::UI::Components::ListSelection menulist;
 	    };
 	}
     }

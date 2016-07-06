@@ -6,8 +6,8 @@
 #include "window.hh"
 #include "programcontroller.hh"
 
-static const char* const menuOptions[] = {"Start game", "Quit"};
-static const unsigned int menuOptionsSize = 2;
+static void StartPressed(void* data);
+static void QuitPressed(void* data);
 
 bool SHH::UI::Components::MenuOverlay::Init()
 {
@@ -16,14 +16,24 @@ bool SHH::UI::Components::MenuOverlay::Init()
 	SHH::Log::Error("UI::Components::MenuOverlay::Init(): Could not load font.");
 	return false;
     }
+
+    if (!menulist.Init())
+    {
+	SHH::Log::Error("UI::Components::MenuOverlay::Init(): Could not init menulist.");
+	return false;
+    }
+
+    menulist.AddMenuOption("Start game", StartPressed, (void*)&visible);
+    menulist.AddMenuOption("Quit", QuitPressed, nullptr);
+    menulist.SetPosition(40, 200);
     
     visible = true;
-    selection = 0;
     return true;
 }
 
 void SHH::UI::Components::MenuOverlay::Deinit()
 {
+    menulist.Deinit();
 }
 
 void SHH::UI::Components::MenuOverlay::ProcessInputs()
@@ -31,27 +41,9 @@ void SHH::UI::Components::MenuOverlay::ProcessInputs()
     if (SHH::Window::IsKeyPressed("Escape"))
     {
 	visible = !visible;
+	menulist.SetFocus(visible);
     }
-    else if (SHH::Window::IsKeyPressed("Up"))
-    {
-	selection = (selection + menuOptionsSize - 1) % menuOptionsSize;
-    }
-    else if (SHH::Window::IsKeyPressed("Down"))
-    {
-	selection = (selection + 1) % menuOptionsSize;
-    }
-    else if (SHH::Window::IsKeyPressed("Return"))
-    {
-	if (selection == 0)
-	{
-	    SHH::UI::Commands::Map("de_dust2");
-	    visible = false;
-	}
-	else if (selection == 1)
-	{
-	    SHH::ProgramController::Quit();
-	}
-    }
+    menulist.ProcessInputs();
 }
 
 void SHH::UI::Components::MenuOverlay::Draw()
@@ -65,21 +57,23 @@ void SHH::UI::Components::MenuOverlay::Draw()
 	SHH::Window::SetColor(0xFF, 0xFF, 0xFF, 0xFF);
 	SHH::Window::SetFontCharSize(14, 24);
 	SHH::Window::DrawText("res/fonts/default.ttf", "\"Practice, practice, practice, ...\", Fatal1ty", 20, 100);
-
-	for (unsigned int i = 0; i < menuOptionsSize; ++i)
-	{
-	    if (i == selection)
-	    {
-		SHH::Window::SetColor(0x7F, 0xFF, 0x7F, 0x0F);
-		SHH::Window::DrawFilledRectangle(40, 200 + (40 * i), 210, 240 + (40 * i));
-		SHH::Window::SetColor(0xFF, 0xFF, 0xFF, 0xFF);
-	    }
-	    SHH::Window::DrawText("res/fonts/default.ttf", menuOptions[i], 45, 208 + (40 * i));
-	}
+	menulist.Draw();
     }
 }
 
 bool SHH::UI::Components::MenuOverlay::Visible()
 {
     return visible;
+}
+
+static void StartPressed(void* data)
+{
+    SHH::UI::Commands::Map("de_dust2");
+    *((bool*)data) = false;
+}
+
+static void QuitPressed(void* data)
+{
+    (void)data;
+    SHH::ProgramController::Quit();
 }

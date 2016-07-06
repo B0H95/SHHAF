@@ -234,7 +234,7 @@ void SHH::Window::DrawText(std::string fontname, std::string text, int x, int y)
 
     for (int i = 0; i < (int)text.length(); ++i)
     {
-	rect.x = x + (charWidth * i);
+	rect.x = x + (fontCharDrawWidth * i);
 
 	if (rect.x >= windowWidth)
 	{

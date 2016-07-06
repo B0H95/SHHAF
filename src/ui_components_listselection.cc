@@ -15,7 +15,7 @@ bool SHH::UI::Components::ListSelection::Init()
     y = 0;
     fontw = 14;
     fonth = 24;
-    focus = true;
+    focus = false;
     selection = 0;
     listsize = 0;
     return true;

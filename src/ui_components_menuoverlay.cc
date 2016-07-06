@@ -26,6 +26,7 @@ bool SHH::UI::Components::MenuOverlay::Init()
     menulist.AddMenuOption("Start game", StartPressed, (void*)&visible);
     menulist.AddMenuOption("Quit", QuitPressed, nullptr);
     menulist.SetPosition(40, 200);
+    menulist.SetFocus(true);
     
     visible = true;
     return true;

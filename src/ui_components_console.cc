@@ -35,12 +35,12 @@ void SHH::UI::Components::Console::ProcessInputs()
 	}
 	if (visible)
 	{
-	    if (SHH::Window::IsKeyPressed("Backspace") && input.length() > 0)
+	    if (currentKey == "Backspace" && input.length() > 0)
 	    {
 		input.pop_back();
 		return;
 	    }
-	    if (SHH::Window::IsKeyPressed("Space"))
+	    if (currentKey == "Space")
 	    {
 		input += " ";
 		return;
@@ -61,7 +61,6 @@ void SHH::UI::Components::Console::ProcessInputs()
 		--scroll;
 		return;
 	    }
-	    std::string currentKey = SHH::Window::GetCurrentKey();
 	    if (currentKey.length() == 1)
 	    {
 		input += currentKey;

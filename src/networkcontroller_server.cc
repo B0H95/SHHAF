@@ -6,6 +6,7 @@
 #include "messagehandler.hh"
 #include "units.hh"
 #include "udpsocket.hh"
+#include "simulation.hh"
 
 struct client
 {
@@ -197,7 +198,12 @@ static void SendPlayerIdentificationMessage(ipaddr const& ip, unsigned int id)
     message_sim playerIdMessage;
     playerIdMessage.messagetype = MS_PLAYERIDENTIFICATION;
     playerIdMessage.obj.owner = id;
-    SHH::UDP::Send("ns" + SHH::Units::SerializeSimMessage(playerIdMessage), ip);   
+    SHH::UDP::Send("ns" + SHH::Units::SerializeSimMessage(playerIdMessage), ip);
+    message_ctrl mapChangeMessage;
+    mapChangeMessage.messagetype = MC_MAPCHANGE;
+    mapChangeMessage.sender = 0;
+    mapChangeMessage.str = SHH::Simulation::GetMapName();
+    SHH::UDP::Send("nc" + SHH::Units::SerializeCtrlMessage(mapChangeMessage), ip);
 }
 
 static void CheckForClientInactivity()

@@ -20,5 +20,6 @@ namespace SHH
 	messaging_mode GetMessagingMode();
 	unsigned int GetPlayerId();
 	void SetPlayerId(unsigned int pid);
+	std::string GetMapName();
     }
 }

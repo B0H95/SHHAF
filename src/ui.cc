@@ -58,6 +58,10 @@ void SHH::UI::SendMessage(std::string msg)
     msg.erase(0, separatorpos + 1);
     std::string param = msg;
 
+    if (cmd == "LOCALPORT")
+    {
+	SHH::UI::Commands::SetLocalPort(SHH::Util::StringToInt(param));
+    }
     if (cmd == "MAP")
     {
 	SHH::UI::Commands::Map(param);

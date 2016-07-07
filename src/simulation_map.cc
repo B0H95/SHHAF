@@ -7,6 +7,8 @@
 #include "networkcontroller.hh"
 #include "log.hh"
 
+static std::string currentMap = "";
+
 static unsigned int newObjectIndex = 1;
 
 static const unsigned int OBJECT_LIST_SIZE = 100;
@@ -182,6 +184,7 @@ bool SHH::Simulation::Map::LoadMap(std::string mapname)
 {
     SHH::Simulation::Map::FlushEnvironments();
     SHH::Simulation::Map::FlushObjects();
+    currentMap = mapname;
     if (mapname == "menu")
     {
 	return true;
@@ -261,6 +264,10 @@ void SHH::Simulation::Map::HandleMessages()
 		SHH::Log::Log("Simulation::Map::HandleMessages(): Disconnected.");
 	    }
 	}
+	else if (msg->messagetype == MC_MAPCHANGE)
+	{
+	    SHH::Simulation::Map::LoadMap(msg->str);
+	}
     }
 
     for (unsigned int i = 0; i < simMessageListSize; ++i)
@@ -292,6 +299,11 @@ void SHH::Simulation::Map::HandleMessages()
 
     ctrlMessageListSize = 0;
     simMessageListSize = 0;
+}
+
+std::string SHH::Simulation::Map::GetMapName()
+{
+    return currentMap;
 }
 
 bool InsertObject(object const& obj)

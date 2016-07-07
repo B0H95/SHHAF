@@ -190,7 +190,7 @@ static void QuitPressed(void* data)
 static void ConnectPressed(void* data)
 {
     SHH::Log::Log("Connect to: " + ((std::string*)data)[0] + ":" + ((std::string*)data)[1]);
-    //SHH::UI::Commands::Connect(((std::string*)data)[0], ((std::string*)data)[1]);
+    SHH::UI::Commands::Connect(((std::string*)data)[0], SHH::Util::StringToInt(((std::string*)data)[1]));
 }
 
 static void StartServerPressed(void* data)

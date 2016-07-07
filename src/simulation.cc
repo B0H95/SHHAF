@@ -159,6 +159,11 @@ void SHH::Simulation::SetPlayerId(unsigned int pid)
     playerId = pid;
 }
 
+std::string SHH::Simulation::GetMapName()
+{
+    return SHH::Simulation::Map::GetMapName();
+}
+
 static void updateApplyBehaviors()
 {
     object* objectList = SHH::Simulation::Map::GetObjectList();

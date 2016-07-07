@@ -22,6 +22,7 @@ namespace SHH
 	    bool PushControlMessage(message_ctrl* msg);
 	    bool PushSimulationMessage(message_sim* msg);
 	    void HandleMessages();
+	    std::string GetMapName();
 	}
     }
 }

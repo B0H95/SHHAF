@@ -52,6 +52,7 @@ enum mctype
 
     MC_RESPAWN,
     MC_DISCONNECT,
+    MC_MAPCHANGE,
 
     MC_MARKER_CTRL
 };

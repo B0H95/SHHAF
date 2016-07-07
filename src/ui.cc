@@ -58,30 +58,7 @@ void SHH::UI::SendMessage(std::string msg)
     msg.erase(0, separatorpos + 1);
     std::string param = msg;
 
-    static uint32_t serverport = 0;
-
-    if (cmd == "LOCALPORT")
-    {
-	SHH::UI::Commands::SetLocalPort(SHH::Util::StringToInt(param));
-    }
-    else if (cmd == "SERVERPORT")
-    {
-	serverport = SHH::Util::StringToInt(param);
-    }
-    else if (cmd == "STARTSERVER")
-    {
-	SHH::UI::Commands::StartServer();
-    }
-    else if (cmd == "CONNECT")
-    {
-	if (serverport == 0)
-	{
-	    SHH::Log::Warning("UI::SendMessage(): Must set SERVERPORT first.");
-	    return;
-	}
-	SHH::UI::Commands::Connect(param, serverport);
-    }
-    else if (cmd == "MAP")
+    if (cmd == "MAP")
     {
 	SHH::UI::Commands::Map(param);
     }

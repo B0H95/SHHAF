@@ -39,7 +39,7 @@ void SHH::UI::Components::ListSelection::ProcessInputs()
 	{
 	    selection = (selection + 1) % listsize;
 	}
-	else if (SHH::Window::IsKeyPressed("Return"))
+	else if (SHH::Window::IsKeyPressed("Return") && menuActions[selection] != nullptr)
 	{
 	    menuActions[selection](menuActionExtra[selection]);
 	}
@@ -94,4 +94,9 @@ void SHH::UI::Components::ListSelection::SetFontSize(int w, int h)
     textdrawer.SetFontCharSize(w, h);
     fontw = w;
     fonth = h;
+}
+
+unsigned int SHH::UI::Components::ListSelection::Size()
+{
+    return listsize;
 }

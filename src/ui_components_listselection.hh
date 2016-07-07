@@ -23,6 +23,7 @@ namespace SHH
 		void ClearList();
 		void SetPosition(int nx, int ny);
 		void SetFontSize(int w, int h);
+		unsigned int Size();
 
 	    private:
 		SHH::UI::Components::Text textdrawer;
